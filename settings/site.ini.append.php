@@ -1,10 +1,10 @@
 <?php /* #?ini charset="utf-8"?
 
 [TemplateSettings]
-ExtensionAutoloadPath[]=myutils
+ExtensionAutoloadPath[]=leztoolbox
 
 [URLTranslator]
-Extensions[]=myutils
+Extensions[]=leztoolbox
 TransformationGroup=lower
 
 [DebugSettings]
@@ -14,6 +14,6 @@ DebugToolbar=disabled
 DefaultVersion=2.0
 
 [RegionalSettings]
-TranslationExtensions[]=myutils
+TranslationExtensions[]=leztoolbox
 
 */ ?>

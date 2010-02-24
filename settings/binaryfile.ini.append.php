@@ -16,7 +16,7 @@ MetaDataExtractor[application/vnd.ms-powerpoint]=ezbinaryfile
 # in your extension and add the extension name to automatically
 # get handlers from the extension when it's turned on.
 # Handlers need to be placed in the extension subdir "plugins".
-ExtensionRepositories[]=myutils
+ExtensionRepositories[]=leztoolbox
 
 
 
