@@ -1,10 +1,13 @@
 ChangeLog
 ---------
 
- - myUtils 1.0.1
+ - leZToolbox 1.1
+    * Remove deprecated functions and rename leZToolbox
+
+ - leZToolbox 1.0.1
     * Remove feed template operator. Use http://projects.ez.no/ezfeedparse
     * Add custom attribute filter : REGXP
 
 
- - myUtils 1.0
+ - leZToolbox 1.0
     * First release

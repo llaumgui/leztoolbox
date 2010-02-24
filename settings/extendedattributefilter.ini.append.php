@@ -2,8 +2,8 @@
 
 [REGEXP]
 ExtensionName=leztoolbox
-ClassName=myUtilsExtendedFilter
+ClassName=leztbExtendedFilter
 MethodName=regexpSqlParts
-FileName=classes/myutilsextendedfilter.php
+FileName=classes/leztbextendedfilter.php
 
 */ ?>

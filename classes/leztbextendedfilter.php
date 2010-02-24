@@ -1,13 +1,14 @@
 ﻿<?php
 //
-// Definition of myUtilsExtendedFilter class
+// Definition of leztbExtendedFilter class
 //
-// Created on: <07-oct-2008 12:14:34 bf>
+// Created on: <07-oct-2008 12:14:34 GKUL>
 //
-// SOFTWARE NAME: MyUtils
-// SOFTWARE RELEASE: 1.0.1
+// ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
+// SOFTWARE NAME: leZToolbox
+// SOFTWARE RELEASE: 1.1
 // BUILD VERSION:
-// COPYRIGHT NOTICE: Copyright (c) 2008 Guillaume Kulakowski and contributors
+// COPYRIGHT NOTICE: Copyright (c) 2008-2010 Guillaume Kulakowski and contributors
 // SOFTWARE LICENSE: GNU General Public License v2.0
 // NOTICE: >
 //   This program is free software; you can redistribute it and/or
@@ -24,41 +25,23 @@
 //   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 //   MA 02110-1301, USA.
 //
+// ## END COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
 //
 
-
-/*! \file myutilsextendedfilter.php
+/*! \file leztbextendedfilter.php
 */
 
 /*!
-  \class myUtilsExtendedFilter myutilsextendedfilter.php
+  \class leztbExtendedFilter leztbextendedfilter.php
   \brief
 */
-class myUtilsExtendedFilter
+class leztbExtendedFilter
 {
-
-    /*!
-
-     \param $params array
-     \return array
-     */
-    function onlyVisibilityHidden( $params )
-    {
-        $result = array(
-            'tables' => ', ezcontentobject_tree AS tree',
-            'joins'  => ' tree.contentobject_id = ezcontentobject.id AND tree.is_hidden = 1 AND ',
-            'columns' => '' );
-
-        return $result;
-    }
-
-
-
-    /*!
-     Build a query with REGEXP
-
-     \param $params array
-     \return array
+    /**
+     * Build a query with REGEXP
+     *
+     * @param array $params
+     * @return array
      */
     public function regexpSqlParts($params)
     {
