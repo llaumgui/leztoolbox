@@ -1,0 +1,1 @@
+<em{if $classification|trim|ne('')} class="{$classification|wash}"{/if}>{$content}</em>
