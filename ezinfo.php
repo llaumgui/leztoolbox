@@ -30,7 +30,7 @@ class leztbInfo
         return array(   'Name'            => "leZToolBox",
                         'Version'         => "1.1",
                         'Copyright'       => 'Copyright (c) 2008-' . date('Y') . ' Guillaume Kulakowski and contributors',
-                        'info_url'        => "http://trac.llaumgui.com/wiki/eZ%20Publish/MyUtils",
+                        'info_url'        => "http://projects.llaumgui.com/index.php/p/leztoolbox/",
                         'License'         => "GNU General Public License v2.0"
                  );
     }
