@@ -136,6 +136,6 @@ class leztbFunctions
         $operatorValue = $locale->formatDateTimeType(  str_replace('$$', '', $classFormat ), $operatorValue  );
     }
 
-} // EOC
+}
 
 ?>

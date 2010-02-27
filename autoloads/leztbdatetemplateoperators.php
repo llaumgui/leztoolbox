@@ -86,6 +86,6 @@ class leztbDateTemplatesOperators
         }
     }
 
-} // EOC
+}
 
 ?>

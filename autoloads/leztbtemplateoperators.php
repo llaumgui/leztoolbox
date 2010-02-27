@@ -108,6 +108,6 @@ class leztbTemplatesOperators
         }
     }
 
-} // EOC
+}
 
 ?>
