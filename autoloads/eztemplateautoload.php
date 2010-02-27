@@ -31,7 +31,7 @@ $eZTemplateOperatorArray = array();
 
 $eZTemplateOperatorArray[] = array(
     'script' => 'extension/leztoolbox/autoloads/leztbtemplateoperators.php',
-    'class' => 'myutilsTemplatesOperators',
+    'class' => 'leztbTemplatesOperators',
     'operator_names' => array(
         'get_siteaccess',
         'is_debug_enabled',
@@ -42,16 +42,15 @@ $eZTemplateOperatorArray[] = array(
 
 $eZTemplateOperatorArray[] = array(
     'script' => 'extension/leztoolbox/autoloads/leztbdatetemplateoperators.php',
-    'class' => 'myutilsDateTemplatesOperators',
+    'class' => 'leztbDateTemplatesOperators',
     'operator_names' => array(
-        'gmdate',
-        'r_datetime'
+        'related_datetime'
     )
 );
 
 $eZTemplateOperatorArray[] = array(
     'script' => 'extension/leztoolbox/autoloads/leztbstringtemplateoperators.php',
-    'class' => 'myutilsStringTemplatesOperators',
+    'class' => 'leztbStringTemplatesOperators',
     'operator_names' => array(
         'json_decode',
         'str_ireplace',

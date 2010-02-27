@@ -48,8 +48,7 @@ class leztbDateTemplatesOperators
     {
         /* Opérateurs */
         $this->Operators = array(
-            'gmdate',
-            'r_datetime',
+            'related_datetime',
         );
     }
 
@@ -68,11 +67,7 @@ class leztbDateTemplatesOperators
     function namedParameterList()
     {
          return array(
-            'gmdate' => array(
-                'format' => array( 'type' => 'string', 'required' => true, 'default' => ''  ),
-                'timestamp' => array( 'type' => 'integer', 'required' => true, 'default' => time()  ) ),
-
-            'r_datetime'  => array(
+            'related_datetime'  => array(
                 'class' => array( 'type' => 'string', 'required' => true, 'default' => ''  ),
                 'data'  => array( 'type' => 'string', 'required' => false, 'default' => '' ) ),
         );
@@ -85,11 +80,7 @@ class leztbDateTemplatesOperators
     {
         switch ( $operatorName )
         {
-            case 'gmdate':
-                $operatorValue = gmdate( $namedParameters['format'], $namedParameters['timestamp'] );
-                break;
-
-            case 'r_datetime':
+            case 'related_datetime':
                 leztbFunctions::relatedDatetime( $operatorValue, $namedParameters['class'], $namedParameters['data'] );
                 break;
         }

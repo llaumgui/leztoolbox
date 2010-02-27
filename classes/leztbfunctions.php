@@ -1,6 +1,6 @@
 <?php
 //
-// Definition of myUtilsFunctions class
+// Definition of leztbFunctions class
 //
 // Created on: <01-Sep-2008 19:00:00 GKUL>
 //
@@ -28,23 +28,22 @@
 // ## END COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
 //
 
-/*! \file myutilsfunctions.php
+/*! \file leztbfunctions.php
 */
 
 /*!
-  \class myUtilsFunctions myutilsfunctions.php
+  \class leztbFunctions leztbfunctions.php
   \brief Ensemble de fonctions utilisée pour l'extension myUtils
  */
 class leztbFunctions
 {
 
-    /*!
-     Converti un "path" en "path_array".
-     Permet de retrouver un équivalent de $node.path_array là où il n'y a que
-     les informations path, par exemple dans le pagelayout ($module_result.path).
-
-     \param $path array
-     \return array
+    /**
+     * Convert "path" to "path_array".
+     * Lets find an equivalent of $node.path_array where there are only feedback path, eg in the pagelayout ($module_result.path).
+     *
+     * @param $path array
+     * @return array
      */
     static function path2PathArray( $path )
     {
@@ -63,11 +62,11 @@ class leztbFunctions
 
 
 
-    /*!
-     Fonction header() de php mise en forme pour faire des redirections.
-
-     \param $url string URL de redirection
-     \param $type integer Type de redirection
+    /**
+     * Redirect with php header
+     *
+     * @param string $url Url to redirect
+     * @param integer $type Type of redirection
      */
     static function redirect( $url, $type=0 )
     {
@@ -86,12 +85,12 @@ class leztbFunctions
 
 
 
-    /*!
-     Fonction datetime relative (Aujourd'hui, hier, etc..)
-
-     \param $operatorValue integer
-     \param $class string
-     \param $data string
+    /**
+     * Relative (yesterday, today) datetime
+     *
+     * @param integer &$operatorValue Timestamp
+     * @param string $class
+     * @param string $data
      */
     static function relatedDatetime( &$operatorValue, $class, $data )
     {
