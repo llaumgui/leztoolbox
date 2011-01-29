@@ -32,9 +32,11 @@ ManualAddingOfItems=disabled
 
 CustomAttributes[]
 CustomAttributes[]=url_to_fanpage
+CustomAttributes[]=height
+CustomAttributes[]=width
+CustomAttributes[]=color_scheme
 CustomAttributes[]=show_faces
 CustomAttributes[]=show_stream
-CustomAttributes[]=color_scheme
 CustomAttributes[]=show_header
 
 CustomAttributeTypes[show_faces]=checkbox
