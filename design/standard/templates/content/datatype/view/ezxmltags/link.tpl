@@ -1,1 +1,0 @@
-<a href={$href|ezurl}{if $id} id="{$id}"{/if}{if $title} title="{$title}"{/if}{if $target|eq('_blank')} target="{$target}"{/if}{if $classification|trim|ne('')} class="{$classification|wash}"{/if}>{$content}</a>
