@@ -18,7 +18,7 @@
 <div class="col-content">
     <div id="replace_facebook_likebox_{$block.id}"></div>
     <script type="text/javascript">//<![CDATA[
-        $(document).ready(function(){ldelim}$object_code='<object data="http://www.facebook.com/plugins/likebox.php?href={$block.custom_attributes.url_to_fanpage|urlencode()}&amp;colorscheme={$color_scheme}&amp;show_faces={$block.custom_attributes.show_faces}&amp;stream={$block.custom_attributes.show_stream}&amp;header={$block.custom_attributes.show_header}&amp;width={$block.custom_attributes.width}&amp;height={$block.custom_attributes.height}" style="border:none;overflow:hidden;width:{$block.custom_attributes.width}px;height:{$block.custom_attributes.height}px"><\/object>';$('#replace_facebook_likebox_{$block.id}').replaceWith($object_code);{rdelim});
+        $(document).ready(function(){ldelim}$object_code='<iframe src="http://www.facebook.com/plugins/likebox.php?href={$block.custom_attributes.url_to_fanpage|urlencode()}&amp;colorscheme={$color_scheme}&amp;show_faces={$block.custom_attributes.show_faces}&amp;stream={$block.custom_attributes.show_stream}&amp;header={$block.custom_attributes.show_header}&amp;width={$block.custom_attributes.width}&amp;height={$block.custom_attributes.height}" style="border:none;overflow:hidden;width:{$block.custom_attributes.width}px;height:{$block.custom_attributes.height}px"><\/iframe>';$('#replace_facebook_likebox_{$block.id}').replaceWith($object_code);{rdelim});
     //]]></script>
 </div>
 </div>
