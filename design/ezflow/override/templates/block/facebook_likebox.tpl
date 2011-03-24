@@ -1,8 +1,6 @@
 {def $color_scheme = 'light'}
 {if $block.custom_attributes.color_scheme|ne('')}{set $color_scheme = $block.custom_attributes.color_scheme}{/if}
 
-{def $valid_nodes = $block.valid_nodes}
-
 <!-- BLOCK: START -->
 
 <div class="block-type-facebook_likebox" id="facebook_likebox_{$block.id}">
