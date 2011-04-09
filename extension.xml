@@ -8,6 +8,12 @@
         <info_url>http://projects.llaumgui.com/index.php/p/leztoolbox</info_url>
 
         <software>
+	        <uses>
+	            <name>jQuery Cookies</name>
+	            <license>Licensed under the BSD, MIT, and GPL (your choice!) Licenses</license>
+	            <copyright>2005-2010 James Auldridge</copyright>
+	            <version>2.20</version>
+	        </uses>
         </software>
 
     </metadata>
