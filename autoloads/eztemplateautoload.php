@@ -6,7 +6,7 @@
 // SOFTWARE NAME: leZToolbox
 // SOFTWARE RELEASE: 1.1
 // BUILD VERSION:
-// COPYRIGHT NOTICE: Copyright (c) 2008-2010 Guillaume Kulakowski and contributors
+// COPYRIGHT NOTICE: Copyright (c) 2008-2011 Guillaume Kulakowski and contributors
 // SOFTWARE LICENSE: GNU General Public License v2.0
 // NOTICE: >
 //   This program is free software; you can redistribute it and/or
@@ -34,8 +34,6 @@ $eZTemplateOperatorArray[] = array(
     'class' => 'leztbTemplatesOperators',
     'operator_names' => array(
         'get_siteaccess',
-        'is_debug_enabled',
-        'path_to_path_array',
         'redirect'
     )
 );

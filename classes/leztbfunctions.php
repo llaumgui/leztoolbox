@@ -8,7 +8,7 @@
 // SOFTWARE NAME: leZToolbox
 // SOFTWARE RELEASE: 1.1
 // BUILD VERSION:
-// COPYRIGHT NOTICE: Copyright (c) 2008-2010 Guillaume Kulakowski and contributors
+// COPYRIGHT NOTICE: Copyright (c) 2008-2011 Guillaume Kulakowski and contributors
 // SOFTWARE LICENSE: GNU General Public License v2.0
 // NOTICE: >
 //   This program is free software; you can redistribute it and/or
@@ -37,30 +37,6 @@
  */
 class leztbFunctions
 {
-
-    /**
-     * Convert "path" to "path_array".
-     * Lets find an equivalent of $node.path_array where there are only feedback path, eg in the pagelayout ($module_result.path).
-     *
-     * @param $path array
-     * @return array
-     */
-    static function path2PathArray( $path )
-    {
-        $path_array = array();
-        if ( !is_array( $path ) )
-        {
-            return array();
-        }
-
-        foreach ( $path as $p )
-        {
-            $path_array[]=$p['node_id'];
-        }
-        return $path_array;
-    }
-
-
 
     /**
      * Redirect with php header

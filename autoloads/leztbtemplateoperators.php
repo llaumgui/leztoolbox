@@ -8,7 +8,7 @@
 // SOFTWARE NAME: leZToolbox
 // SOFTWARE RELEASE: 1.1
 // BUILD VERSION:
-// COPYRIGHT NOTICE: Copyright (c) 2008-2010 Guillaume Kulakowski and contributors
+// COPYRIGHT NOTICE: Copyright (c) 2008-2011 Guillaume Kulakowski and contributors
 // SOFTWARE LICENSE: GNU General Public License v2.0
 // NOTICE: >
 //   This program is free software; you can redistribute it and/or
@@ -49,8 +49,6 @@ class leztbTemplatesOperators
         /* Opérateurs */
         $this->Operators = array(
             'get_siteaccess',
-            'is_debug_enabled',
-            'path_to_path_array',
             'redirect'
         );
     }
@@ -72,11 +70,6 @@ class leztbTemplatesOperators
          return array(
             'get_siteaccess' => array( ),
 
-            'is_debug_enabled' => array( ),
-
-            'path_to_path_array' => array(
-                'path' => array( 'type' => 'array', 'required' => true, 'default' => ''  ),  ),
-
             'redirect'  => array(
                 'url' => array( 'type' => 'string', 'required' => true, 'default' => ''  ),
                 'type' => array( 'type' => 'integer', 'required' => false, 'default' => '301' )  )
@@ -92,14 +85,6 @@ class leztbTemplatesOperators
         {
             case 'get_siteaccess':
                 $operatorValue = $GLOBALS['eZCurrentAccess']['name'];
-                break;
-
-            case 'is_debug_enabled':
-                $operatorValue = eZDebug::isDebugEnabled();
-                break;
-
-            case 'path_to_path_array':
-                $operatorValue = leztbFunctions::path2PathArray( $namedParameters['path'] );
                 break;
 
             case 'redirect':
