@@ -1,10 +1,10 @@
 <?php
 //
-// Created on: <01-Sep-2008 19:00:00 GKUL>
+// Created on: <08-Apr-2011 19:00:00 GKUL>
 //
 // ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
-// SOFTWARE NAME: leZRSS
-// SOFTWARE RELEASE: 1.0
+// SOFTWARE NAME: leZToolbox
+// SOFTWARE RELEASE: 1.2
 // BUILD VERSION:
 // COPYRIGHT NOTICE: Copyright (c) 2008-2010 Guillaume Kulakowski and contributors
 // SOFTWARE LICENSE: GNU General Public License v2.0

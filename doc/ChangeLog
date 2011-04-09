@@ -1,6 +1,10 @@
 ChangeLog
 ---------
 
+ - leZToolbox 1.2
+    * Remove deprecated template operator
+    * Add eZPortal
+    
  - leZToolbox 1.1
     * Remove deprecated functions and rename leZToolbox
 
