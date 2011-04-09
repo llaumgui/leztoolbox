@@ -14,6 +14,12 @@
 	            <copyright>2005-2010 James Auldridge</copyright>
 	            <version>2.20</version>
 	        </uses>
+            <uses>
+                <name>jQueryUI</name>
+                <license>GNU General Public License v2.0</license>
+                <copyright>jQuery UI Team</copyright>
+                <version>1.8.11</version>
+            </uses>
         </software>
 
     </metadata>
