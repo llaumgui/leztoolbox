@@ -18,12 +18,7 @@
 <div class="col-1">
 <div class="col-content" id="replace_twitterbox_{$block.id}">
 <script type="text/javascript">//<![CDATA[
-$(document).ready(function(){ldelim}
-$('#replace_twitterbox_{$block.id}').jTweetsAnywhere({ldelim}
-searchParams: '{$block.custom_attributes.search_params}',
-    count: {$count}
-  {rdelim});
-{rdelim});
+$(document).ready(function(){ldelim}$('#replace_twitterbox_{$block.id}').jTweetsAnywhere({ldelim}searchParams:'{$block.custom_attributes.search_params}',count:{$count}{rdelim});{rdelim});
 //]]></script>
 </div>
 </div>
