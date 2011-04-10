@@ -28,4 +28,4 @@ $(document).ready(function(){ldelim}$('#replace_twitterbox_{$block.id}').jTweets
 
 </div>
 <!-- BLOCK: END -->
-{undef count}
+{undef $count}
