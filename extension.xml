@@ -9,10 +9,10 @@
 
         <software>
 	        <uses>
-	            <name>jQuery Cookies</name>
-	            <license>Licensed under the BSD, MIT, and GPL (your choice!) Licenses</license>
-	            <copyright>2005-2010 James Auldridge</copyright>
-	            <version>2.20</version>
+	            <name>jTweetsAnywhere</name>
+	            <license>Licensed under the MIT license</license>
+	            <copyright>2010 Thomas Billenstein</copyright>
+	            <version>1.2.0</version>
 	        </uses>
             <uses>
                 <name>jQueryUI</name>
