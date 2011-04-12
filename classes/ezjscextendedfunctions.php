@@ -26,6 +26,9 @@
 // ## END COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
 //
 
+/**
+ * Thank to Pobel Damien and admin2pp ;-)
+ */
 class ezjscExtendedFunctions extends ezjscServerFunctions
 {
 
