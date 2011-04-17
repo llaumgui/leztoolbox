@@ -102,11 +102,11 @@ class leztbFunctions
 
         if ( $date == $today )
         {
-            $classFormat = preg_replace( '#\$\$(.+?)\$\$#',  ezi18n( 'myutils/date', 'Today' ), $classFormat );
+            $classFormat = preg_replace( '#\$\$(.+?)\$\$#',  ezpI18n::tr( 'myutils/date', 'Today' ), $classFormat );
         }
         else if ( $date == $yesterday )
         {
-            $classFormat = preg_replace( '#\$\$(.+?)\$\$#',  ezi18n( 'myutils/date', 'Yesterday' ), $classFormat );
+            $classFormat = preg_replace( '#\$\$(.+?)\$\$#',  ezpI18n::tr( 'myutils/date', 'Yesterday' ), $classFormat );
         }
 
         $operatorValue = $locale->formatDateTimeType(  str_replace('$$', '', $classFormat ), $operatorValue  );
