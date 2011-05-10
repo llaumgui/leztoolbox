@@ -4,7 +4,14 @@
  * @require jQuery 1.6.x (tested on 1.5.2)
  * @require jQueryUI 1.8.x (tested on 1.8.11)
  * @require jQuery Cookie 2.2.x <http://code.google.com/p/cookies/> (tested on 2.2.0)
- *
+ * 
+ * 1/ Create your structure and apply "$ezPortal.options.zonesClass" on each columns. 
+ * 2/ Apply "$ezPortal.options.blockClass" on each block/portlet.
+ * 3/ Add an element "$ezPortal.options.blockHeader" on each block/portlet.
+ * 4/ Optional: Create a "$ezPortal.options.resetButtonID".
+ * 5/ Optional: Create a "$ezPortal.options.saveButtonID".
+ * 6/ Optional: Create a "$ezPortal.options.loadButtonID".
+ * 
  * ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
  * SOFTWARE NAME: eZPortal
  * SOFTWARE RELEASE: 1.0
@@ -30,49 +37,54 @@
 ;( function($)
 {
     /**
-     * $eZPortal main function
+     * $.ezPortal main function.
      */
     $.ezPortal = {
 
         version: '0.9.5',
 
-        /* Default options */
+        /**
+         * All default options used by $.ezPortal. Can be overrided by passing
+         * options parameter to init() like  $.ezPortal.init( myOptions );
+         */
         options: {
-    		// Class and elements options
-            zonesClass: '.portal .zone', /* CSS class for each columns */
-            blockClass: '.block', /* CSS class for each block */
-            blockHeader: 'h2', /* Block header element and draggable zone */
+        	
+    		// Class and elements options:
+            zonesClass: '.portal .zone', 	/* CSS class(es) for each columns */
+            blockClass: '.block', 				  /* CSS class for each block */
+            blockHeader: 'h2', 	   /* Block header element and draggable zone */
 
-            // Class and elements for action buttons
-            resetButtonID: '#portalReset',
-            saveButtonID: '#portalSave',
-            loadButtonID: '#portalLoad',
+            // Class and elements for action buttons:
+            resetButtonID: '#portalReset', /* CSS identifier for reset button */
+            saveButtonID: '#portalSave',    /* CSS identifier for save button */
+            loadButtonID: '#portalLoad',   /* CSS identifier for load button */
 
             // Portlet controls
-            canMinimized: true, /* Block have minus option */
-            canDeleted: true, /* Block have delete option */
+            canMinimized: true,                    /* Block have minus option */
+            canDeleted: true,                     /* Block have delete option */
 
             // Cookie options
-            cookieName: 'ezPortal_v095', /* Cookie name */
-            saveInCookie: true, /* Save in cookies for each sort action */
+            cookieName: 'ezPortal_v095', 					   /* Cookie name */
+            saveInCookie: true,       /* Save in cookies for each sort action */
 
             // Save in database options
-            saveModule: 'user/preferences/set_and_exit', /* Save information in this module */
-            keyName: 'ezPortal', /* Keyname used by ezpreference module */
+            dBSaveFunction: 'storeDatabases',  /* function used to save in DB */
+            keyName: 'ezPortal',       /* Keyname used by ezpreference module */
 
             // Misc options
-            debug: false /* Enable internal debug */
+            debug: false    						 /* Enable internal debug */
         },
 
         /* System */
         sortableZones: [],
         sortableBlock: [],
+        sortableBlockHeader: [],
         defaultOrder: {},
         cookie: {},
 
 
         /**
-         * Init eZPortal
+         * Init eZPortal.
          *
          * @param JSON options Option passed to the ezPortal
          * @param JSON initialOrder Allow to set an initial order
@@ -86,7 +98,7 @@
          */
         init: function ( options, initialOrder ) {
 
-        	// Pass option
+        	// Pass option:
         	$.extend(
     			$.ezPortal.options,
     			options
@@ -95,31 +107,36 @@
         	$.ezPortal.debug('Init $.eZPortal v' + $.ezPortal.version );
         	$.ezPortal.debug( $.ezPortal.options );
 
-            // Get and set sortable elements
+            // Get and set sortable elements:
             $.ezPortal.sortableZones = $($.ezPortal.options.zonesClass);
             $.ezPortal.saveButton = $($.ezPortal.options.saveButtonID);
             $.ezPortal.loadButton = $($.ezPortal.options.loadButtonID);
             $.ezPortal.resetButton = $($.ezPortal.options.resetButtonID);
 
-        	// Get the default sortable order before any modification used by reset
+        	// Get the default sortable order before any modification used by reset:
             $.ezPortal.defaultOrder = $.ezPortal.getSortableOrder();
 
-            // Add mandatory classes
+            
+            /*
+             * Add mandatory classes.
+             */
+            // Add portlet class:
             $.ezPortal.sortableBlock = $($.ezPortal.options.zonesClass + ' ' + $.ezPortal.options.blockClass)
-            	.addClass( "ui-widget ui-widget-content ui-helper-clearfix portlet" )
-                 .end();
+            	.addClass( "ui-widget ui-widget-content ui-helper-clearfix portlet" );
 
+            // Add header class:
             $.ezPortal.sortableBlockHeader = $.ezPortal.sortableBlock.find( "h2:first" )
-            	.addClass( "ui-widget-header" )
-        		.end();
+            	.addClass( "ui-widget-header" );
 
-        	if ( $.ezPortal.options.canDelete == true ) {
-        		$.ezPortal.sortableBlockHeader.prepend( "<span class='ui-icon ui-icon-delthick'></span>")
+            // Add minus and delete controler
+            if ( $.ezPortal.options.canMinimized == true ) {
+        		$.ezPortal.sortableBlockHeader.prepend( '<span class="ui-icon ui-icon-minusplusthick ui-icon-minusthick"></span>');
         	}
-        	if ( $.ezPortal.options.canMinimized ) {
-        		$.ezPortal.sortableBlockHeader.prepend( "<span class='ui-icon ui-icon-minusthick'></span>")
+            if ( $.ezPortal.options.canDeleted == true ) {
+        		$.ezPortal.sortableBlockHeader.prepend( '<span class="ui-icon ui-icon-delthick"></span>');
         	}
 
+        	
             /*
              * Read cookie informations to set $.ezPortal.cookie.
              * If readed cookie is false, init $.ezPortal.cookie with
@@ -138,8 +155,8 @@
 	            }
             }
             else {
-                $.ezPortal.debug('No cookie store');
-
+                $.ezPortal.debug('Don\'t use cookie for store order');
+                // Try to get order from initial order variable
                 if ( initialOrder != null && initialOrder != '' )
                 	$.ezPortal.setSortableOrder(initialOrder);
             }
@@ -148,21 +165,26 @@
             $.ezPortal.sortableZones.sortable({
                 connectWith: $.ezPortal.options.zonesClass,
                 handle: $.ezPortal.options.blockHeader,
+                // Add update event
                 update: function(event, ui) {
-	            	$.ezPortal.saveButton.ezpEnableButton('storeDatabases');
-	        		if ( $.ezPortal.options.saveInCookie == false ) {
+	            	$.ezPortal.saveButton.ezpEnableButton( $.ezPortal.options.dBSaveFunction );
+	        		if ( $.ezPortal.options.saveInCookie == true) {
 	        			$.ezPortal.storeZoneInCookie( $(this) );
 	            	}
                 }
             });
 
+            
+            /*
+             * Add controler events.
+             */
             // Add event Minimize/Normalize on .ui-icon
             $( "h2 .ui-icon" ).click(function() {
                 $(this).parents( ".portlet:first" ).ezpBlockToggle();
             });
 
             // Add event delete on .ui-icon
-            $( "h2 .delthick" ).click(function() {
+            /*$( "h2 .delthick" ).click(function() {
             	$(this).parent().parent().hide();
             	$.ezPortal.saveButton.ezpEnableButton('storeDatabases');
         		for ( var param in $.ez.defaultPortalOrder.first_colonne ){
@@ -186,7 +208,7 @@
         				$("input[name="+param+"]").attr("checked", "");
         			}
         		}
-            });
+            });*/
 
             // Disable and enable buttons
             $.ezPortal.saveButton.addClass('disabled');
@@ -303,7 +325,7 @@
          * Call the used module to store order in Database.
          */
         storeDatabases: function() {
-            var url = jQuery.ez.url.replace( 'ezjscore/', $.ezPortal.options.saveModule + '/' )
+            var url = jQuery.ez.url.replace( 'ezjscore/', 'user/preferences/set_and_exit/' )
             	+ $.ezPortal.options.keyName + '/' + JSON.stringify( $.ezPortal.getSortableOrder() );
 
             $.ezPortal.debug( 'Update database: ' + url );
@@ -351,14 +373,15 @@
      * </code>
      */
     $.fn.ezpBlockToggle = function() {
-        this.find( "h2:first .ui-icon" )
+        this.find( "h2:first .ui-icon-minusplusthick" )
         	.toggleClass( "ui-icon-minusthick" )
         	.toggleClass( "ui-icon-plusthick" )
-        	.find( ".content:first" )
-        		.toggle()
+        	.end();
+    	this.find( ".content:first" )
+        	.toggle()
     		.end();
 
-    	if ( $.ezPortal.options.saveInCookie == false ) {
+    	if ( $.ezPortal.options.saveInCookie == true ) {
 			$.ezPortal.storeZoneInCookie( this.parents($.ezPortal.options.zonesClass) );
     	}
     };
@@ -372,11 +395,12 @@
      * </code>
      */
     $.fn.ezpBlockMinimize = function() {
-    	this.find( "h2:first .ui-icon" )
+    	this.find( "h2:first .ui-icon-minusplusthick" )
     		.removeClass( "ui-icon-minusthick" )
     		.addClass( "ui-icon-plusthick" )
-    		.find( ".content:first" )
-    			.hide()
+    		.end();
+    	this.find( ".content:first" )
+    		.hide()
     		.end();
     };
 
@@ -402,7 +426,7 @@
      */
     $.fn.ezpBlockNormalize = function() {
     	this.show()
-    		.find( "h2:first .ui-icon" )
+    		.find( "h2:first .ui-icon-minusplusthick" )
     			.removeClass( "ui-icon-plusthick" )
     			.addClass( "ui-icon-minusthick" )
 			.end();
