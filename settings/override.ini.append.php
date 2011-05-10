@@ -24,4 +24,12 @@ Subdir=templates
 Match[type]=TwitterBox
 Match[view]=twitterbox
 
+
+[block_eZPortal_ezportal]
+Source=block/view/view.tpl
+MatchFile=block/ezportal.tpl
+Subdir=templates
+Match[type]=eZPortal
+Match[view]=ezportal
+
 */ ?>

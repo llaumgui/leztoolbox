@@ -4,7 +4,7 @@
 AllowedTypes[]=FacebookILike
 AllowedTypes[]=FacebookLikeBox
 AllowedTypes[]=TwitterBox
-
+AllowedTypes[]=eZPortal
 
 [FacebookILike]
 Name=Facebook "I like"
@@ -53,5 +53,21 @@ ViewList[]
 ViewList[]=twitterbox
 ViewName[]
 ViewName[twitterbox]=Twitter Box
+
+
+[eZPortal]
+Name=eZPortal controls
+ManualAddingOfItems=disabled
+CustomAttributes[]
+CustomAttributes[]=reset_button
+CustomAttributes[]=load_button
+CustomAttributes[]=save_button
+CustomAttributeTypes[reset_button]=checkbox
+CustomAttributeTypes[load_button]=checkbox
+CustomAttributeTypes[save_button]=checkbox
+ViewList[]
+ViewList[]=ezportal
+ViewName[]
+ViewName[ezportal]=eZPortal
 
 */ ?>
