@@ -4,14 +4,14 @@
  * @require jQuery 1.6.x (tested on 1.5.2)
  * @require jQueryUI 1.8.x (tested on 1.8.11)
  * @require jQuery Cookie 2.2.x <http://code.google.com/p/cookies/> (tested on 2.2.0)
- * 
- * 1/ Create your structure and apply "$ezPortal.options.zonesClass" on each columns. 
+ *
+ * 1/ Create your structure and apply "$ezPortal.options.zonesClass" on each columns.
  * 2/ Apply "$ezPortal.options.blockClass" on each block/portlet.
  * 3/ Add an element "$ezPortal.options.blockHeader" on each block/portlet.
  * 4/ Optional: Create a "$ezPortal.options.resetButtonID".
  * 5/ Optional: Create a "$ezPortal.options.saveButtonID".
  * 6/ Optional: Create a "$ezPortal.options.loadButtonID".
- * 
+ *
  * ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
  * SOFTWARE NAME: eZPortal
  * SOFTWARE RELEASE: 1.0
@@ -48,8 +48,8 @@
          * options parameter to init() like  $.ezPortal.init( myOptions );
          */
         options: {
-        	
-    		// Class and elements options:
+
+            // Class and elements options:
             zonesClass: '.portal .zone', 	/* CSS class(es) for each columns */
             blockClass: '.block', 				  /* CSS class for each block */
             blockHeader: 'h2', 	   /* Block header element and draggable zone */
@@ -98,14 +98,14 @@
          */
         init: function ( options, initialOrder ) {
 
-        	// Pass option:
-        	$.extend(
-    			$.ezPortal.options,
-    			options
-			);
+            // Pass option:
+            $.extend(
+                $.ezPortal.options,
+                options
+            );
 
-        	$.ezPortal.debug('Init $.eZPortal v' + $.ezPortal.version );
-        	$.ezPortal.debug( $.ezPortal.options );
+            $.ezPortal.debug('Init $.eZPortal v' + $.ezPortal.version );
+            $.ezPortal.debug( $.ezPortal.options );
 
             // Get and set sortable elements:
             $.ezPortal.sortableZones = $($.ezPortal.options.zonesClass);
@@ -113,52 +113,52 @@
             $.ezPortal.loadButton = $($.ezPortal.options.loadButtonID);
             $.ezPortal.resetButton = $($.ezPortal.options.resetButtonID);
 
-        	// Get the default sortable order before any modification used by reset:
+            // Get the default sortable order before any modification used by reset:
             $.ezPortal.defaultOrder = $.ezPortal.getSortableOrder();
 
-            
+
             /*
              * Add mandatory classes.
              */
             // Add portlet class:
             $.ezPortal.sortableBlock = $($.ezPortal.options.zonesClass + ' ' + $.ezPortal.options.blockClass)
-            	.addClass( "ui-widget ui-widget-content ui-helper-clearfix portlet" );
+                .addClass( "ui-widget ui-widget-content ui-helper-clearfix portlet" );
 
             // Add header class:
             $.ezPortal.sortableBlockHeader = $.ezPortal.sortableBlock.find( "h2:first" )
-            	.addClass( "ui-widget-header" );
+                .addClass( "ui-widget-header" );
 
             // Add minus and delete controler
             if ( $.ezPortal.options.canMinimized == true ) {
-        		$.ezPortal.sortableBlockHeader.prepend( '<span class="ui-icon ui-icon-minusplusthick ui-icon-minusthick"></span>');
-        	}
-            if ( $.ezPortal.options.canDeleted == true ) {
-        		$.ezPortal.sortableBlockHeader.prepend( '<span class="ui-icon ui-icon-delthick"></span>');
-        	}
+                $.ezPortal.sortableBlockHeader.prepend( '<span class="ui-icon ui-icon-minusplusthick ui-icon-minusthick"></span>');
+            }
+            /* if ( $.ezPortal.options.canDeleted == true ) {
+                $.ezPortal.sortableBlockHeader.prepend( '<span class="ui-icon ui-icon-delthick"></span>');
+            }*/
 
-        	
+
             /*
              * Read cookie informations to set $.ezPortal.cookie.
              * If readed cookie is false, init $.ezPortal.cookie with
              * $.ezPortal.defaultOrder. If is true set sortable order with him.
              */
             if ( $.ezPortal.options.saveInCookie == true ) {
-            	$.ezPortal.cookie = $.cookies.get( $.ezPortal.options.cookieName );
-	            if ( $.ezPortal.cookie  ) {
-	                $.ezPortal.debug('Cookie');
-	                // Set from cookie
-	                $.ezPortal.setSortableOrder($.ezPortal.cookie);
-	            }
-	            else {
-	                $.ezPortal.debug('No cookie');
-	                $.ezPortal.cookie = $.ezPortal.defaultOrder;
-	            }
+                $.ezPortal.cookie = $.cookies.get( $.ezPortal.options.cookieName );
+                if ( $.ezPortal.cookie  ) {
+                    $.ezPortal.debug('Cookie');
+                    // Set from cookie
+                    $.ezPortal.setSortableOrder($.ezPortal.cookie);
+                }
+                else {
+                    $.ezPortal.debug('No cookie');
+                    $.ezPortal.cookie = $.ezPortal.defaultOrder;
+                }
             }
             else {
                 $.ezPortal.debug('Don\'t use cookie for store order');
                 // Try to get order from initial order variable
                 if ( initialOrder != null && initialOrder != '' )
-                	$.ezPortal.setSortableOrder(initialOrder);
+                    $.ezPortal.setSortableOrder(initialOrder);
             }
 
             // Enable jQueryUI sortable with all options
@@ -167,14 +167,14 @@
                 handle: $.ezPortal.options.blockHeader,
                 // Add update event
                 update: function(event, ui) {
-	            	$.ezPortal.saveButton.ezpEnableButton( $.ezPortal.options.dBSaveFunction );
-	        		if ( $.ezPortal.options.saveInCookie == true) {
-	        			$.ezPortal.storeZoneInCookie( $(this) );
-	            	}
+                    $.ezPortal.saveButton.ezpEnableButton( $.ezPortal.options.dBSaveFunction );
+                    if ( $.ezPortal.options.saveInCookie == true) {
+                        $.ezPortal.storeZoneInCookie( $(this) );
+                    }
                 }
             });
 
-            
+
             /*
              * Add controler events.
              */
@@ -185,29 +185,29 @@
 
             // Add event delete on .ui-icon
             /*$( "h2 .delthick" ).click(function() {
-            	$(this).parent().parent().hide();
-            	$.ezPortal.saveButton.ezpEnableButton('storeDatabases');
-        		for ( var param in $.ez.defaultPortalOrder.first_colonne ){
+                $(this).parent().parent().hide();
+                $.ezPortal.saveButton.ezpEnableButton('storeDatabases');
+                for ( var param in $.ez.defaultPortalOrder.first_colonne ){
 
-        			if($(this).parent().parent().attr("id")==param)
-        			{
-        				$("input[name="+param+"]").attr("checked", "");
-        			}
-        		}
-        		for ( var param in $.ez.defaultPortalOrder.second_colonne ){
+                    if($(this).parent().parent().attr("id")==param)
+                    {
+                        $("input[name="+param+"]").attr("checked", "");
+                    }
+                }
+                for ( var param in $.ez.defaultPortalOrder.second_colonne ){
 
-        			if($(this).parent().parent().attr("id")==param)
-        			{
-        				$("input[name="+param+"]").attr("checked", "");
-        			}
-        		}
-        		for ( var param in $.ez.defaultPortalOrder.last_colonne ){
+                    if($(this).parent().parent().attr("id")==param)
+                    {
+                        $("input[name="+param+"]").attr("checked", "");
+                    }
+                }
+                for ( var param in $.ez.defaultPortalOrder.last_colonne ){
 
-        			if($(this).parent().parent().attr("id")==param)
-        			{
-        				$("input[name="+param+"]").attr("checked", "");
-        			}
-        		}
+                    if($(this).parent().parent().attr("id")==param)
+                    {
+                        $("input[name="+param+"]").attr("checked", "");
+                    }
+                }
             });*/
 
             // Disable and enable buttons
@@ -231,12 +231,12 @@
          */
         debug: function(msg) {
             if ( $.ezPortal.options.debug ) {
-            	if (typeof console == "undefined" || typeof console.log == "undefined") {
-        			alert(msg);
-            	}
-            	else {
-            		console.log(msg);
-            	}
+                if (typeof console == "undefined" || typeof console.log == "undefined") {
+                    alert(msg);
+                }
+                else {
+                    console.log(msg);
+                }
             }
         },
 
@@ -245,18 +245,18 @@
          * Get sortable order
          */
         getSortableOrder: function() {
-        	order = {};
+            order = {};
             $.ezPortal.sortableZones.each(function() {
                 zoneID = $(this).attr('id');
                 order[zoneID] = {};
                 $(this).find($.ezPortal.options.blockClass).each(function() {
-                	order[zoneID][$(this).attr('id')] = {
+                    order[zoneID][$(this).attr('id')] = {
                         state: $(this).ezpBlockGetState()
                     };
                 });
             });
-        	$.ezPortal.debug('Order:'); $.ezPortal.debug(order);
-        	return order;
+            $.ezPortal.debug('Order:'); $.ezPortal.debug(order);
+            return order;
         },
 
 
@@ -298,7 +298,7 @@
 
             // Get identifier of each element in column
             zone.find( $.ezPortal.options.blockClass ).each(function() {
-            	$.ezPortal.cookie[zoneID][$(this).attr('id')] =  {
+                $.ezPortal.cookie[zoneID][$(this).attr('id')] =  {
                     state: $(this).ezpBlockGetState()
                 };
             });
@@ -326,7 +326,7 @@
          */
         storeDatabases: function() {
             var url = jQuery.ez.url.replace( 'ezjscore/', 'user/preferences/set_and_exit/' )
-            	+ $.ezPortal.options.keyName + '/' + JSON.stringify( $.ezPortal.getSortableOrder() );
+                + $.ezPortal.options.keyName + '/' + JSON.stringify( $.ezPortal.getSortableOrder() );
 
             $.ezPortal.debug( 'Update database: ' + url );
             jQuery.post( url, {}, function(){} );
@@ -338,7 +338,7 @@
          * Reset the order.
          */
         resetOrder: function() {
-        	$.ezPortal.setSortableOrder( $.ezPortal.defaultOrder );
+            $.ezPortal.setSortableOrder( $.ezPortal.defaultOrder );
         }
 
     }; // EO $.ezPortal
@@ -374,16 +374,16 @@
      */
     $.fn.ezpBlockToggle = function() {
         this.find( "h2:first .ui-icon-minusplusthick" )
-        	.toggleClass( "ui-icon-minusthick" )
-        	.toggleClass( "ui-icon-plusthick" )
-        	.end();
-    	this.find( ".content:first" )
-        	.toggle()
-    		.end();
+            .toggleClass( "ui-icon-minusthick" )
+            .toggleClass( "ui-icon-plusthick" )
+            .end();
+        this.find( ".content:first" )
+            .toggle()
+            .end();
 
-    	if ( $.ezPortal.options.saveInCookie == true ) {
-			$.ezPortal.storeZoneInCookie( this.parents($.ezPortal.options.zonesClass) );
-    	}
+        if ( $.ezPortal.options.saveInCookie == true ) {
+            $.ezPortal.storeZoneInCookie( this.parents($.ezPortal.options.zonesClass) );
+        }
     };
 
 
@@ -395,13 +395,13 @@
      * </code>
      */
     $.fn.ezpBlockMinimize = function() {
-    	this.find( "h2:first .ui-icon-minusplusthick" )
-    		.removeClass( "ui-icon-minusthick" )
-    		.addClass( "ui-icon-plusthick" )
-    		.end();
-    	this.find( ".content:first" )
-    		.hide()
-    		.end();
+        this.find( "h2:first .ui-icon-minusplusthick" )
+            .removeClass( "ui-icon-minusthick" )
+            .addClass( "ui-icon-plusthick" )
+            .end();
+        this.find( ".content:first" )
+            .hide()
+            .end();
     };
 
 
@@ -413,7 +413,7 @@
      * </code>
      */
     $.fn.ezpBlockDelete = function() {
-    	this.hide();
+        this.hide();
     };
 
 
@@ -425,11 +425,11 @@
      * </code>
      */
     $.fn.ezpBlockNormalize = function() {
-    	this.show()
-    		.find( "h2:first .ui-icon-minusplusthick" )
-    			.removeClass( "ui-icon-plusthick" )
-    			.addClass( "ui-icon-minusthick" )
-			.end();
+        this.show()
+            .find( "h2:first .ui-icon-minusplusthick" )
+                .removeClass( "ui-icon-plusthick" )
+                .addClass( "ui-icon-minusthick" )
+            .end();
         this.find( ".content:first" ).show();
     };
 
@@ -445,12 +445,12 @@
      */
     $.fn.ezpEnableButton = function( action ) {
         this.removeClass('disabled')
-        	.each(function() {
-		    	$(this).unbind('click').click(function() {
-		    		eval( '$.ezPortal.' + action + '()' );
-		    	});
-        	})
-        	.end();
+            .each(function() {
+                $(this).unbind('click').click(function() {
+                    eval( '$.ezPortal.' + action + '()' );
+                });
+            })
+            .end();
     };
 
 
@@ -463,9 +463,9 @@
      */
     $.fn.ezpDisableButton = function() {
         this.addClass('disabled')
-    	.each(function() {
-	    	$(this).unbind('click');
-    	});
+        .each(function() {
+            $(this).unbind('click');
+        });
     };
 
 })(jQuery);
