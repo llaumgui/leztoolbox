@@ -1,39 +1,18 @@
 <?php
-//
-// Definition of leztbFunctions class
-//
-// Created on: <01-Sep-2008 19:00:00 GKUL>
-//
-// ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
-// SOFTWARE NAME: leZToolbox
-// SOFTWARE RELEASE: 1.2
-// BUILD VERSION:
-// COPYRIGHT NOTICE: Copyright (c) 2008-2011 Guillaume Kulakowski and contributors
-// SOFTWARE LICENSE: GNU General Public License v2.0
-// NOTICE: >
-//   This program is free software; you can redistribute it and/or
-//   modify it under the terms of version 2.0  of the GNU General
-//   Public License as published by the Free Software Foundation.
-//
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of version 2.0 of the GNU General
-//   Public License along with this program; if not, write to the Free
-//   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-//   MA 02110-1301, USA.
-//
-// ## END COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
-//
+/**
+ * File containing the leztbFunctions class
+ *
+ * @version //autogentag//
+ * @package LeZToolbox
+ * @copyright Copyright (C) 2008-2012 Guillaume Kulakowski and contributors
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0
+ */
 
-/*! \file leztbfunctions.php
-*/
-
-/*!
-  \class leztbFunctions leztbfunctions.php
-  \brief Ensemble de fonctions utilisée pour l'extension myUtils
+/**
+ * The leztbFunctions provide functions used by LeZToolbox
+ *
+ * @package LeZToolbox
+ * @version //autogentag//
  */
 class leztbFunctions
 {
@@ -49,13 +28,13 @@ class leztbFunctions
         switch( $type )
         {
             case 301:
-                header("HTTP/1.1 301 Moved Permanently");
+                header( 'HTTP/1.1 301 Moved Permanently' );
                 break;
             case 307:
-                header("HTTP/1.1 307 Temporary Redirect");
+                header( 'HTTP/1.1 307 Temporary Redirect' );
                 break;
         }
-        header ('location: '.$url);
+        header( 'location: ' . $url );
         eZExecution::cleanExit();
     }
 
@@ -64,7 +43,7 @@ class leztbFunctions
     /**
      * Relative (yesterday, today) datetime
      *
-     * @param integer &$operatorValue Timestamp
+     * @param integer $operatorValue
      * @param string $class
      * @param string $data
      */
@@ -72,9 +51,9 @@ class leztbFunctions
     {
         $locale = eZLocale::instance();
         $dateFormat = '%d-%m-%Y';
-        $date = $locale->formatDateTimeType( $dateFormat, $operatorValue);
-        $today = $locale->formatDateTimeType( $dateFormat);
-        $yesterday = $locale->formatDateTimeType( $dateFormat, time()-86400);
+        $date = $locale->formatDateTimeType( $dateFormat, $operatorValue );
+        $today = $locale->formatDateTimeType( $dateFormat );
+        $yesterday = $locale->formatDateTimeType( $dateFormat, time()-86400 );
 
         if ( $class === null )
         {
@@ -109,7 +88,7 @@ class leztbFunctions
             $classFormat = preg_replace( '#\$\$(.+?)\$\$#',  ezpI18n::tr( 'myutils/date', 'Yesterday' ), $classFormat );
         }
 
-        $operatorValue = $locale->formatDateTimeType(  str_replace('$$', '', $classFormat ), $operatorValue  );
+        $operatorValue = $locale->formatDateTimeType(  str_replace( '$$', '', $classFormat ), $operatorValue );
     }
 
 }
