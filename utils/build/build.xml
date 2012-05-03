@@ -30,7 +30,7 @@
     <property name="qatools.php.cmd" value="/opt/qatools/bin/qatools-php.php" />
     <property name="qatools.php.options" value="" />
     <property name="qatools.php.options.include" value="" />
-    <property name="qatools.php.options.exclude" value="-e '@tests@'" />
+    <property name="qatools.php.options.exclude" value="" />
 
     <!-- QA : QATools eZTpl -->
     <property name="qatools.eztpl.ezpublish.dir" value="/opt/ezpublish" />
@@ -62,6 +62,9 @@
 
     <patternset id="pattern.js">
         <include name="**/*.js"/>
+        <exclude name="**/*.min.js" />
+        <exclude name="**/jquery.cookies.js" />
+        <exclude name="**/jquery.jtweetsanywhere.js" />
     </patternset>
 
 
@@ -99,10 +102,10 @@
 
         <!-- QATools -->
         <phingcall target="qatools-php" />
-        <!-- phingcall target="qatools-eztpl" / -->
+        <phingcall target="qatools-eztpl" />
 
         <!-- Lint -->
-        <!-- phingcall target="jslint" / -->
+        <phingcall target="jslint" />
         <!--phingcall target="csslint" / -->
 
         <!-- Doc and stats -->
