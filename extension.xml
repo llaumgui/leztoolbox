@@ -2,23 +2,23 @@
 <software>
     <metadata>
         <name>leZToolBox</name>
-        <version>1.2</version>
+        <version>//autogentag//</version>
         <copyright>Copyright (c) 2008-2011 Guillaume Kulakowski and contributors</copyright>
         <license>GNU General Public License v2.0</license>
         <info_url>http://projects.llaumgui.com/index.php/p/leztoolbox</info_url>
 
         <software>
-	        <uses>
-	            <name>jTweetsAnywhere</name>
-	            <license>Licensed under the MIT license</license>
-	            <copyright>2010 Thomas Billenstein</copyright>
-	            <version>1.2.0</version>
-	        </uses>
             <uses>
-                <name>jQueryUI</name>
-                <license>GNU General Public License v2.0</license>
-                <copyright>jQuery UI Team</copyright>
-                <version>1.8.11</version>
+                <name>jQuery Cookies</name>
+                <license>Licensed under the BSD, MIT, and GPL (your choice!) Licenses</license>
+                <copyright>Copyright (c) 2005 - 2010, James Auldridge</copyright>
+                <version>2.2.0</version>
+            </uses>
+            <uses>
+                <name>jTweetsAnywhere</name>
+                <license>Licensed under the MIT license</license>
+                <copyright>2010 Thomas Billenstein</copyright>
+                <version>1.3.1</version>
             </uses>
         </software>
 

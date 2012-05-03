@@ -1,14 +1,234 @@
-/*
- * jTweetsAnywhere V1.2.0
+/**
+ * jTweetsAnywhere V1.3.1
  * http://thomasbillenstein.com/jTweetsAnywhere/
  *
- * Copyright 2010, Thomas Billenstein
+ * Copyright 2011, Thomas Billenstein
  * Licensed under the MIT license.
  * http://thomasbillenstein.com/jTweetsAnywhere/license.txt
  */
+
+
+/**
+ * The code below is used as supplied by Twitter (https://dev.twitter.com/docs/intents)
+ *
+ * Twitter says:
+
+ * "Some sites may prefer to embed the unobtrusive Web Intents pop-up Javascript inline
+ * or without a dependency to platform.twitter.com. The snippet below will offer the
+ * equivalent functionality without the external dependency."
+ */
+(function()
+{
+  if (window.__twitterIntentHandler)
+	  return;
+
+  var intentRegex = /twitter\.com(\:\d{2,4})?\/intent\/(\w+)/,
+      windowOptions = 'scrollbars=yes,resizable=yes,toolbar=no,location=yes',
+      width = 550,
+      height = 420,
+      winHeight = screen.height,
+      winWidth = screen.width;
+
+
+  function handleIntent(e)
+  {
+    e = e || window.event;
+
+    var target = e.target || e.srcElement,
+        m, left, top;
+
+    while (target && target.nodeName.toLowerCase() !== 'a')
+    {
+      target = target.parentNode;
+    }
+
+    if (target && target.nodeName.toLowerCase() === 'a' && target.href)
+    {
+      m = target.href.match(intentRegex);
+      if (m)
+      {
+        left = Math.round((winWidth / 2) - (width / 2));
+        top = 0;
+
+        if (winHeight > height)
+        {
+          top = Math.round((winHeight / 2) - (height / 2));
+        }
+
+        window.open(target.href, 'intent', windowOptions + ',width=' + width + ',height=' + height + ',left=' + left + ',top=' + top);
+        e.returnValue = false;
+        e.preventDefault && e.preventDefault();
+      }
+    }
+  }
+
+  if (document.addEventListener)
+  {
+    document.addEventListener('click', handleIntent, false);
+  }
+  else if (document.attachEvent)
+  {
+    document.attachEvent('onclick', handleIntent);
+  }
+
+  window.__twitterIntentHandler = true;
+}());
+
+
+/**
+ * JTA_I18N is based on SimpleI18N V0.1.0
+ *
+ * SimpleI18N.js is a tiny library for simple i18n support in Javascript.
+ * Currently only translation is supported.
+ */
+(function()
+{
+	if (window.__JTA_I18N)
+	{
+		return;
+	}
+
+	JTA_I18N = function()
+	{
+		var _resources = {};
+
+		function ResourceBundle(locale, resources)
+		{
+			this.getLocale = function()
+			{
+				return locale;
+			};
+
+			this.get = function(key, params)
+			{
+				return xlate(key, 1, params);
+			};
+
+			this._ = this.get;
+
+			this.nget = function(singular, plural, count, params)
+			{
+				return count === 1 ? xlate(singular, 1, params) : xlate(plural, count, params);
+			};
+
+			this.__ = this.nget;
+
+			function xlate(key, count, params)
+			{
+				var resource = getValue(key);
+
+				if (count !== 1 && typeof resource === "object")
+				{
+					resource = evalMulti(key, resource, count);
+				}
+
+				if (resource && params)
+				{
+					for (p in params)
+					{
+						resource = resource.replace(p, getValue(params[p]));
+					}
+				}
+
+				return resource;
+			};
+
+			function getValue(resource)
+			{
+				return resources ? (resources[resource] || resource) : resource;
+			};
+
+			function evalMulti(key, resource, count)
+			{
+				for (pat in resource)
+				{
+					var re = /(\d+)\s*-\s*(\d+)/,
+					match = re.exec(pat);
+
+					if (match)
+					{
+						var from = match[1];
+						var to = match[2];
+						if (count >= from && count <= to)
+						{
+							return resource[pat];
+						}
+					}
+
+					re = /([<>]=?)\s*(\d+)/;
+					match = re.exec(pat);
+
+					if (match)
+					{
+						var op = match[1];
+						var num = match[2];
+						if (op === '>' && count > num)
+						{
+							return resource[pat];
+						}
+						else if (op === '>=' && count >= num)
+						{
+							return resource[pat];
+						}
+						else if (op === '<' && count < num)
+						{
+							return resource[pat];
+						}
+						else if (op === '<=' && count <= num)
+						{
+							return resource[pat];
+						}
+					}
+
+					re = /\s*,\s*/;
+					match = pat.split(re);
+
+					if (match)
+					{
+						for (var i = 0; i < match.length; i++)
+						{
+							if (count === ~~match[i])
+							{
+								return resource[pat];
+							}
+						}
+					}
+				}
+
+				return key;
+			}
+		};
+
+		return {
+
+			addResourceBundle: function(project, locale, resources)
+			{
+				if (!_resources[project])
+				{
+					_resources[project] = {};
+				}
+
+				_resources[project][locale] = resources;
+			},
+
+			getResourceBundle: function(project, locale)
+			{
+				return new ResourceBundle(locale, _resources[project] ? _resources[project][locale] : null);
+			}
+		};
+	}();
+
+	window.__JTA_I18N = true;
+}());
+
+JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
+{
+	'$$monthNames': [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
+});
+
 (function($)
 {
-	$.fn.jTweetsAnywhere = function(options)
+	$.fn.jTweetsAnywhere = function(config)
 	{
 		// setup the default options
 		var options = $.extend(
@@ -25,7 +245,8 @@
 			username: 'tbillenstein',
 
 			/**
-			 * The name of a user's list where the tweet feed is generated from
+			 * The name of a user's list where the tweet feed is generated from. The special
+			 * list name 'favorites' can be used to display a user's favorited tweets.
 			 */
 			list: null,
 
@@ -52,11 +273,9 @@
 			 * IMPORTANT: Please always keep in mind, that the use of the Twitter API is
 			 * rate limited. Non-authenticated users are rated IP-based and you have only
 			 * 150 calls per hour available. Every retrieval of tweets counts and so does
-			 * for example hovering over a profile image to show the hovercard. The rate
-			 * limit is not limited to a special application or plugin like jTweetsAnywhere
-			 * but counts for all of them running on the same machine/ip. jTweetsAnywhere
-			 * will always check the remaining count of free API calls before actually
-			 * calling Twitter to avoid black listing your visitor's IP.
+			 * for example hovering over a profile image to show the hovercard.
+			 * jTweetsAnywhere will always check the remaining count of free API calls before
+			 * actually calling Twitter to avoid black listing your visitor's IP.
 			 */
 			count: 0,
 
@@ -87,7 +306,20 @@
 			 * - if count not equals 0 and showTweetFeed equals false, no feed
 			 *   is displayed
 			 * {
-			 *     expandHovercards: false,		// Boolean - Show Hovercards in expanded mode.
+			 *     autoConformToTwitterStyleguide: false,
+			 *     								// Boolean - as the name implies, sets all options to confirm to Twitter's
+			 *     								// styleguide regulations. Implies:
+			 *     								// showTweetFeed: {
+			 *     								//     showUserFullNames: null,	// null means: if usernames are shown, show
+			 *     								//								// fullnames too
+			 *     								//     showTwitterBird: true,
+			 *									//     showActionReply: true,
+			 *									//     showActionRetweet: true,
+			 *									//     showActionFavorite: true
+			 *     								// }
+			 *
+			 *     showTwitterBird: true,		// Boolean - show Twitter bird icon beneath the timestamp of a tweet, linking to
+			 *     								// the tweeter's MiniProfile Web Intent
 			 *
 			 *     showTimestamp: true, 		// A flag (true/false) that specifies whether to display a tweet's timestamp
 			 * 									// or an object literal representing the configuration options for the
@@ -104,6 +336,15 @@
 			 *
 			 *     showInReplyTo: true,			// Boolean - Show link to the "replied to" tweet (if available).
 			 *
+			 *     showActionReply: false,		// Boolean - Show tweet's 'Reply' action (supplies a link to popup the tweet's
+			 *     								// Reply Web Intent)
+			 *
+			 *     showActionRetweet: false,	// Boolean - Show tweet's 'Retweet' action (supplies a link to popup the tweet's
+			 *     								// Retweet Web Intent)
+			 *
+			 *     showActionFavorite: false,	// Boolean - Show tweet's 'Favorite' action (supplies a link to popup the tweet's
+			 *     								// Favorite Web Intent)
+			 *
 			 *     showProfileImages: null,		// A flag (true/false) that specifies whether to display a profile image in
 			 * 									// tweets. If the param is set to null (the default value), a profile image
 			 * 									// is displayed only if the feed represents a user's list or the result of a
@@ -118,6 +359,8 @@
 			 * 									// in tweets. If the param is set to null, a user's full name
 			 * 									// is displayed only if the feed represents a user's list or the result of a
 			 * 									// Twitter search.
+			 *
+			 *     expandHovercards: false,		// Boolean - Show Hovercards in expanded mode.
 			 *
 			 *	   includeRetweets: true,		// Boolean - Include native retweets in a user's tweet feed
 			 *
@@ -135,9 +378,7 @@
 		     *									// IMPORTANT: Please always keep in mind, that using the Twitter API is rate
 		     *									// limited. Non-authenticated users are rated IP-based and you have only 150
 		     *									// calls per hour available. Every retrieval of tweets counts and so does for
-		     *									// example hovering over a profile image to show the hovercard. The rate limit
-		     *									// is not limited to a special application or plugin like jTweetsAnywhere but
-		     *									// counts for all of them running on the same machine/ip. jTweetsAnywhere will
+		     *									// example hovering over a profile image to show the hovercard. jTweetsAnywhere will
 			 *									// always check the remaining count of free API calls before actually calling
 			 *									// Twitter to avoid black listing your visitor's IP.
 			 *
@@ -192,12 +433,29 @@
 			 *     counter: true,				// Boolean - Display a counter in the Tweet Box for counting characters
 			 *     width: 515,					// Number - The width of the Tweet Box in pixels
 			 *     height: 65,					// Number - The height of the Tweet Box in pixels
-			 *     label: "What's happening",	// String - The text above the Tweet Box, a call to action
+			 *     label: "What's happening?",	// String - The text above the Tweet Box, a call to action
 			 *     defaultContent: <none>,		// String - Pre-populated text in the Tweet Box. Useful for an @mention, a #hashtag, a link, etc.
 			 *     onTweet: <none>				// Function - Specify a listener for when a tweet is sent from the Tweet Box. The listener receives two arguments: a plaintext tweet and an HTML tweet
 			 * }
 			 */
 			showTweetBox: false,
+
+			/**
+			 * Identifies the locale for I18N support. The default locale is 'en'. To use this option you have to inlude the
+			 * adequate locale script, jtweetsanywhere-{language}-{version}.js, e.g. jtweetsanywhere-de-1.3.0.js
+			 */
+			locale: 'en',
+
+			/**
+			 * A dataProvider is a function that delivers the "raw" Twitter data in
+			 * JSON format. ATM internal use only!
+			 */
+			tweetDataProvider:
+				defaultTweetDataProvider,
+				//mockedTweetDataProvider,
+			rateLimitDataProvider:
+				defaultRateLimitDataProvider,
+				//mockedRateLimitDataProvider,
 
 			/**
 			 * A decorator is a function that is responsible for constructing a certain
@@ -219,12 +477,19 @@
 			tweetBodyDecorator: defaultTweetBodyDecorator,
 			tweetUsernameDecorator: defaultTweetUsernameDecorator,
 			tweetTextDecorator: defaultTweetTextDecorator,
+
 			tweetAttributesDecorator: defaultTweetAttributesDecorator,
+			tweetTwitterBirdDecorator: defaultTweetTwitterBirdDecorator,
 			tweetTimestampDecorator: defaultTweetTimestampDecorator,
 			tweetSourceDecorator: defaultTweetSourceDecorator,
 			tweetGeoLocationDecorator: defaultTweetGeoLocationDecorator,
 			tweetInReplyToDecorator: defaultTweetInReplyToDecorator,
 			tweetRetweeterDecorator: defaultTweetRetweeterDecorator,
+
+			tweetActionsDecorator: defaultTweetActionsDecorator,
+			tweetActionReplyDecorator: defaultTweetActionReplyDecorator,
+			tweetActionRetweetDecorator: defaultTweetActionRetweetDecorator,
+			tweetActionFavoriteDecorator: defaultTweetActionFavoriteDecorator,
 
 			tweetFeedControlsDecorator: defaultTweetFeedControlsDecorator,
 			tweetFeedControlsMoreBtnDecorator: defaultTweetFeedControlsMoreBtnDecorator,
@@ -323,9 +588,16 @@
 			 */
 			onRateLimitDataHandler: defaultOnRateLimitDataHandler,
 
+			/**
+			 * The OnOptionsInitializingHandler event handler is called before initializing
+			 * the user options
+			 */
+			onOptionsInitializingHandler: defaultOnOptionsInitializingHandler,
+
 			_tweetFeedConfig:
 			{
-				expandHovercards: false,
+				autoConformToTwitterStyleguide: false,
+				showTwitterBird: true,
 				showTimestamp:
 				{
 					refreshInterval: 0
@@ -333,9 +605,13 @@
 				showSource: false,
 				showGeoLocation: true,
 				showInReplyTo: true,
+				showActionReply: false,
+				showActionRetweet: false,
+				showActionFavorite: false,
 				showProfileImages: null,
 				showUserScreenNames: null,
 				showUserFullNames: false,
+				expandHovercards: false,
 				includeRetweets: true,
 				paging:
 				{
@@ -348,11 +624,12 @@
 					mode: "none",
 					interval: 60,
 					duration: 3600,
+					max: -1,
 					_startTime: null,
 					_triggerElement: null
 				},
 				_pageParam: 0,
-				_maxId: 0,
+				_maxId: null,
 				_recLevel: 0,
 				_noData: false,
 				_clearBeforePopulate: false
@@ -362,7 +639,7 @@
 				counter: true,
 				width: 515,
 				height: 65,
-				label: "What's happening?",
+				label: null,
 				defaultContent: '',
 				onTweet: function(textTweet, htmlTweet) {}
 			},
@@ -391,8 +668,15 @@
 					remaining_hits: 150,
 					hourly_limit: 150
 				}
-			}
-		}, options);
+			},
+			_resourceBundle: null
+		}, config);
+
+		// save the plugin's base selector
+		options._baseSelector = this.selector;
+
+		options.onOptionsInitializingHandler(options);
+		setupOptions(options);
 
 		// no main decorator? nothing to do!
 		if (!options.mainDecorator)
@@ -400,149 +684,6 @@
 			return;
 		}
 
-		options._baseSelector = this.selector;
-
-		// if username is an array, create the search query and flatten username
-		if (typeof(options.username) != 'string')
-		{
-			if (!options.searchParams)
-			{
-				options.searchParams = ['q=from:' + options.username.join(" OR from:")];
-			}
-
-			options.username = options.username[0];
-		}
-
-		// if showTweetFeed is not set to a boolean value, we expect the configuration of
-		// the tweet feed
-		if (typeof(options.showTweetFeed) == 'object')
-		{
-			$.extend(true, options._tweetFeedConfig, options.showTweetFeed);
-		}
-
-		// if showTweetBox is not set to a boolean value, we expect the configuration of
-		// the TweetBox
-		if (typeof(options.showTweetBox) == 'object')
-		{
-			options._tweetBoxConfig = options.showTweetBox;
-			options.showTweetBox = true;
-		}
-
-		// if showConnectButton is not set to a boolean value, we expect the
-		// configuration of the Connect Button
-		if (typeof(options.showConnectButton) == 'object')
-		{
-			options._connectButtonConfig = options.showConnectButton;
-			options.showConnectButton = true;
-		}
-
-		// to be compatible, check the deprecated option 'tweetProfileImagePresent'
-		if (options._tweetFeedConfig.showProfileImages == null)
-		{
-			options._tweetFeedConfig.showProfileImages = options.tweetProfileImagePresent;
-		}
-
-		// if _tweetFeedConfig.showProfileImages is not set to a boolean value,
-		// we decide to show a profile image if the feed represents a user's
-		// list or the results of a Twitter search
-		if (options._tweetFeedConfig.showProfileImages == null)
-		{
-			options._tweetFeedConfig.showProfileImages = (options.list || options.searchParams) && options.tweetProfileImageDecorator;
-		}
-
-		// if _tweetFeedConfig.showUserScreenNames is not set to a boolean value,
-		// we decide to show a username if the feed represents a user's
-		// list or the results of a Twitter search or a tweet is a native retweet
-		if (options._tweetFeedConfig.showUserScreenNames == null)
-		{
-			if (options.list || options.searchParams)
-			{
-				options._tweetFeedConfig.showUserScreenNames = true;
-			}
-
-			if (!options.tweetUsernameDecorator)
-			{
-				options._tweetFeedConfig.showUserScreenNames = false;
-			}
-		}
-
-		// if _tweetFeedConfig.showUserFullNames is not set to a boolean value,
-		// we decide to show a user's full name if the feed represents a user's
-		// list or the results of a Twitter search or a tweet is a native retweet
-		if (options._tweetFeedConfig.showUserFullNames == null)
-		{
-			if (options.list || options.searchParams)
-			{
-				options._tweetFeedConfig.showUserFullNames = true;
-			}
-
-			if (!options.tweetUsernameDecorator)
-			{
-				options._tweetFeedConfig.showUserFullNames = false;
-			}
-		}
-
-		options.count = validateRange(options.count, 0, options.searchParams ? 100 : 20);
-
-		options._tweetFeedConfig.autorefresh.interval = Math.max(30, options._tweetFeedConfig.autorefresh.interval);
-
-		options._tweetFeedConfig.paging._offset = 0;
-		options._tweetFeedConfig.paging._limit = options.count;
-
-		// internally, the decision of what parts of a widget are to be
-		// displayed is based on the existence of the decorators
-		if (options.count == 0 || !options.showTweetFeed)
-		{
-			options.tweetFeedDecorator = null;
-			options.tweetFeedControlsDecorator = null;
-		}
-
-		if (options._tweetFeedConfig.paging.mode == 'none')
-		{
-			options.tweetFeedControlsDecorator = null;
-		}
-
-		if (!options.showFollowButton)
-		{
-			options.followButtonDecorator = null;
-		}
-
-		if (!options.showTweetBox)
-		{
-			options.tweetBoxDecorator = null;
-		}
-
-		if (!options.showConnectButton)
-		{
-			options.connectButtonDecorator = null;
-		}
-
-		if (!options.showLoginInfo)
-		{
-			options.loginInfoDecorator = null;
-		}
-
-		if (!options._tweetFeedConfig.showTimestamp)
-		{
-			options.tweetTimestampDecorator = null;
-		}
-
-		if (!options._tweetFeedConfig.showSource)
-		{
-			options.tweetSourceDecorator = null;
-		}
-
-		if (!options._tweetFeedConfig.showGeoLocation)
-		{
-			options.tweetGeoLocationDecorator = null;
-		}
-
-		if (!options._tweetFeedConfig.showInReplyTo)
-		{
-			options.tweetInReplyToDecorator = null;
-		}
-
-		// setup ajax
 		$.ajaxSetup({ cache: true });
 
 		return this.each(function()
@@ -564,13 +705,9 @@
 			populateTweetFeed(options);
 			populateAnywhereControls(options);
 
-			// bind event handlers to support paging
 			bindEventHandlers(options);
 
-			// install autorefresh support
-			options._tweetFeedConfig.autorefresh._startTime = new Date().getTime();
-			startAutorefresh(options);
-			startTimestampRefresh(options);
+			setupAutorefresh(options);
 		});
 	};
 	defaultMainDecorator = function(options)
@@ -625,7 +762,7 @@
 		}
 		else if (options._tweetFeedConfig.paging.mode == 'endless-scroll')
 		{
-			// nothing to do here atm
+			// nothing to do here
 		}
 		else
 		{
@@ -639,15 +776,15 @@
 	};
 	defaultTweetFeedControlsMoreBtnDecorator = function(options)
 	{
-		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-more">' + 'More' + '</span>';
+		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-more">' + options._resourceBundle._('More') + '</span>';
 	};
 	defaultTweetFeedControlsPrevBtnDecorator = function(options)
 	{
-		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-prev">' + 'Prev' + '</span>';
+		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-prev">' + options._resourceBundle._('Prev') + '</span>';
 	};
 	defaultTweetFeedControlsNextBtnDecorator = function(options)
 	{
-		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-next">' + 'Next' + '</span>';
+		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-next">' + options._resourceBundle._('Next') + '</span>';
 	};
 	defaultTweetFeedAutorefreshTriggerDecorator = function(count, options)
 	{
@@ -662,7 +799,7 @@
 	};
 	defaultTweetFeedAutorefreshTriggerContentDecorator = function(count, options)
 	{
-		var content = '' + count + ' new ' + (count > 1 ? ' tweets' : ' tweet');
+		var content = options._resourceBundle.__('%count% new tweet', '%count% new tweets', count, { '%count%' : count });
 
 		return '<span class="jta-tweet-list-autorefresh-trigger-content">' + content + '</span>';
 	};
@@ -697,7 +834,7 @@
 		var t = tweet.retweeted_status || tweet;
 
 		// the default profile image decorator simply adds a link to the user's Twitter profile
-		var screenName = t.user ? t.user.screen_name : false || t.from_user;
+		var screenName = getScreenName(tweet);
 		var imageUrl = t.user ? t.user.profile_image_url : false || t.profile_image_url;
 
 		var html =
@@ -724,7 +861,15 @@
 			html += options.tweetAttributesDecorator(tweet, options);
 		}
 
-		return '<div class="jta-tweet-body ' + (options._tweetFeedConfig.showProfileImages ? 'jta-tweet-body-list-profile-image-present' : '') + '">' + html + '</div>';
+		if (options.tweetActionsDecorator)
+		{
+			html += options.tweetActionsDecorator(tweet, options);
+		}
+
+		return '<div class="jta-tweet-body ' +
+			(options._tweetFeedConfig.showProfileImages ? 'jta-tweet-body-list-profile-image-present' : '') + '">' +
+			html +
+			'</div>';
 	};
 	defaultTweetTextDecorator = function(tweet, options)
 	{
@@ -778,11 +923,10 @@
 	defaultTweetUsernameDecorator = function(tweet, options)
 	{
 		// if tweet is a native retweet, use the retweet's profile
-		var t = tweet.retweeted_status || tweet;
-		var screenName = t.user ? t.user.screen_name : false || t.from_user;
-		var fullName = t.user ? t.user.name : null;
+		var screenName = getScreenName(tweet);
+		var fullName = getFullName(tweet);
 
-		var htmlScreenName;
+		var htmlScreenName = null;
 		if (screenName && (options._tweetFeedConfig.showUserScreenNames || (options._tweetFeedConfig.showUserScreenNames == null && tweet.retweeted_status)))
 		{
 			htmlScreenName =
@@ -793,20 +937,19 @@
 				'</span>';
 		}
 
-		var htmlFullName;
+		var htmlFullName = null;
 		if (fullName && (options._tweetFeedConfig.showUserFullNames || (options._tweetFeedConfig.showUserFullNames == null && tweet.retweeted_status)))
 		{
 			htmlFullName =
 				'<span class="jta-tweet-user-full-name">' +
-				(htmlScreenName ? ' (' : '') +
+				(htmlScreenName ? ' ' : '') +
 				'<a class="jta-tweet-user-full-name-link" href="http://twitter.com/' + screenName + '" name="' + screenName + '" target="_blank">' +
 				fullName +
 				'</a>' +
-				(htmlScreenName ? ')' : '') +
 				'</span>';
 		}
 
-		var html = "";
+		var html = '';
 
 		if (htmlScreenName)
 		{
@@ -838,7 +981,8 @@
 	{
 		var html = '';
 
-		if (options.tweetTimestampDecorator ||
+		if (options.tweetTwitterBirdDecorator ||
+			options.tweetTimestampDecorator ||
 			options.tweetSourceDecorator ||
 			options.tweetGeoLocationDecorator ||
 			options.tweetInReplyToDecorator ||
@@ -846,6 +990,11 @@
 		)
 		{
 			html += '<span class="jta-tweet-attributes">';
+
+			if (options.tweetTwitterBirdDecorator)
+			{
+				html += options.tweetTwitterBirdDecorator(tweet, options);
+			}
 
 			if (options.tweetTimestampDecorator)
 			{
@@ -888,16 +1037,30 @@
 		var createdAt = formatDate(tw.created_at);
 
 		// format the timestamp by the tweetTimestampFormatter
-		var tweetTimestamp = options.tweetTimestampFormatter(createdAt);
+		var tweetTimestamp = options.tweetTimestampFormatter(createdAt, options);
 		var tweetTimestampTooltip = options.tweetTimestampTooltipFormatter(createdAt);
 
-		var screenName = tw.user ? tw.user.screen_name : false || tw.from_user;
 		var html =
 			'<span class="jta-tweet-timestamp">' +
 			'<a class="jta-tweet-timestamp-link" data-timestamp="' + createdAt +
-			'" href="http://twitter.com/' + screenName + '/status/' + tw.id + '" target="_blank" title="' +
+			'" href="http://twitter.com/' + getScreenName(tweet) + '/status/' + tw.id + '" target="_blank" title="' +
 			tweetTimestampTooltip + '">' +
 			tweetTimestamp +
+			'</a>' +
+			'</span>';
+
+		return html;
+	};
+	defaultTweetTwitterBirdDecorator = function(tweet, options)
+	{
+		var screenName = getScreenName(tweet);
+		var intentUrl = 'https://twitter.com/intent/user?screen_name=' + screenName;
+		var linkTitle = screenName + ' ' + options._resourceBundle._('on Twitter');
+
+		var html =
+			'<span class="jta-tweet-twitter-bird">' +
+			'<a href="' + intentUrl + '" target="_blank" title="' + linkTitle + '">' +
+			'<span class="jta-tweet-twitter-bird-icon">&nbsp;</span>' +
 			'</a>' +
 			'</span>';
 
@@ -909,7 +1072,7 @@
 
 		return d.toLocaleString();
 	};
-	defaultTweetTimestampFormatter = function(timeStamp)
+	defaultTweetTimestampFormatter = function(timeStamp, options)
 	{
 		var now = new Date();
 
@@ -918,35 +1081,23 @@
 		var tweetTimestamp = '';
 		if (diff < 60)
 		{
-			tweetTimestamp += diff + ' second' + (diff == 1 ? '' : 's') + ' ago';
+			tweetTimestamp += options._resourceBundle.__('%secs% second ago', '%secs% seconds ago', diff, { '%secs%': diff });
 		}
 		else if (diff < 3600)
 		{
 			var t = parseInt((diff + 30) / 60);
-			tweetTimestamp += t + ' minute' + (t == 1 ? '' : 's') + ' ago';
+			tweetTimestamp += options._resourceBundle.__('%mins% minute ago', '%mins% minutes ago', t, { '%mins%': t });
 		}
 		else if (diff < 86400)
 		{
 			var t = parseInt((diff + 1800) / 3600);
-			tweetTimestamp += t + ' hour' + (t == 1 ? '' : 's') + ' ago';
+			tweetTimestamp += options._resourceBundle.__('%hours% hour ago', '%hours% hours ago', t, { '%hours%': t });
 		}
 		else
 		{
 			var d = new Date(timeStamp);
-			var period = 'AM';
 
-			var hours = d.getHours();
-			if (hours > 12)
-			{
-				hours -= 12;
-				period = 'PM';
-			}
-
-			var mins = d.getMinutes();
-			var minutes = (mins < 10 ? '0' : '') + mins;
-
-			var monthName = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
-
+			var monthName = options._resourceBundle._('$$monthNames');
 			tweetTimestamp += monthName[d.getMonth()] + ' ' + d.getDate();
 
 			if (d.getFullYear() < now.getFullYear())
@@ -955,49 +1106,7 @@
 			}
 
 			var t = parseInt((diff + 43200) / 86400);
-			tweetTimestamp += ' (' + t + ' day' + (t == 1 ? '' : 's') + ' ago)';
-		}
-
-		return tweetTimestamp;
-	};
-	exTimestampFormatter = function(timeStamp)
-	{
-		var diff = parseInt((new Date().getTime() - Date.parse(timeStamp)) / 1000);
-
-		var tweetTimestamp = '';
-		if (diff < 60)
-		{
-			tweetTimestamp += 'less than a minute ago';
-		}
-		else if (diff < 3600)
-		{
-			var t = parseInt((diff + 30) / 60);
-			tweetTimestamp += t + ' minute' + (t == 1 ? '' : 's') + ' ago';
-		}
-		else if (diff < 86400)
-		{
-			var t = parseInt((diff + 1800) / 3600);
-			tweetTimestamp += 'about ' + t + ' hour' + (t == 1 ? '' : 's') + ' ago';
-		}
-		else
-		{
-			var t = parseInt((diff + 43200) / 86400);
-			tweetTimestamp += 'about ' + t + ' day' + (t == 1 ? '' : 's') + ' ago';
-
-			var d = new Date(timeStamp);
-			var period = 'AM';
-
-			var hours = d.getHours();
-			if (hours > 12)
-			{
-				hours -= 12;
-				period = 'PM';
-			}
-
-			var mins = d.getMinutes();
-			var minutes = (mins < 10 ? '0' : '') + mins;
-
-			tweetTimestamp += ' ('  + hours + ':' + minutes + ' ' + period + ' ' + (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear() + ')';
+			tweetTimestamp += ' (' + options._resourceBundle.__('%days% day ago', '%days% days ago', t, { '%days%': t }) + ')';
 		}
 
 		return tweetTimestamp;
@@ -1010,7 +1119,7 @@
 		var source = tw.source.replace(/\&lt\;/gi,'<').replace(/\&gt\;/gi,'>').replace(/\&quot\;/gi,'"');
 		var html =
 			'<span class="jta-tweet-source">' +
-			' via ' +
+			' ' + options._resourceBundle._('via') + ' ' +
 			'<span class="jta-tweet-source-link">' +
 			source +
 			'</span>' +
@@ -1025,7 +1134,7 @@
 		// if tweet is a native retweet, use the retweet's source
 		var tw = tweet.retweeted_status || tweet;
 
-		var q;
+		var q = null;
 		if (tw.geo && tw.geo.coordinates)
 		{
 			q = tw.geo.coordinates.join();
@@ -1037,7 +1146,7 @@
 
 		if (q)
 		{
-			var location = 'here';
+			var location = options._resourceBundle._('here');
 			if (tw.place && tw.place.full_name)
 			{
 				location = tw.place.full_name;
@@ -1047,7 +1156,7 @@
 
 			html =
 				'<span class="jta-tweet-location">' +
-				' from ' +
+				' ' + options._resourceBundle._('from') + ' ' +
 				'<a class="jta-tweet-location-link" href="' + link + '" target="_blank">' +
 				location +
 				'</a>' +
@@ -1062,13 +1171,17 @@
 		var tw = tweet.retweeted_status || tweet;
 
 		var html = '';
+
 		if (tw.in_reply_to_status_id && tw.in_reply_to_screen_name)
 		{
+			var linkHref = 'http://twitter.com/' + tw.in_reply_to_screen_name + '/status/' + tw.in_reply_to_status_id;
+			var linkText = options._resourceBundle._('in reply to') + ' ' + tw.in_reply_to_screen_name;
+
 			html =
 				'<span class="jta-tweet-inreplyto">' +
 				' ' +
-				'<a class="jta-tweet-inreplyto-link" href="http://twitter.com/' + tw.in_reply_to_screen_name + '/status/' + tw.in_reply_to_status_id + '" target="_blank">' +
-				'in reply to ' + tw.in_reply_to_screen_name +
+				'<a class="jta-tweet-inreplyto-link" href="' + linkHref + '" target="_blank">' +
+				linkText +
 				'</a>' +
 				'</span>';
 		}
@@ -1081,21 +1194,91 @@
 
 		if (tweet.retweeted_status)
 		{
-			var screenName = tweet.user ? tweet.user.screen_name : false || tweet.from_user;
+			var screenName = getUserScreenName(tweet);
+
 			var rtc = (tweet.retweeted_status.retweet_count || 0) - 1;
 
 			var link =
 				'<a class="jta-tweet-retweeter-link" href="http://twitter.com/' + screenName + '" target="_blank">' +
 				screenName +
 				'</a>';
-			var rtcount = ' and ' + rtc + (rtc > 1 ? ' others' : ' other');
+
+			var rtcount = options._resourceBundle.__(' and %rtc% other', ' and %rtc% others', rtc, { '%rtc%': rtc });
+
 			html =
 				'<br/>' +
 				'<span class="jta-tweet-retweeter">' +
-				'Retweeted by ' + link +
+				options._resourceBundle._('Retweeted by') + ' ' + link +
 				(rtc > 0 ? rtcount : '') +
 				'</span>';
 		}
+
+		return html;
+	};
+	defaultTweetActionsDecorator = function(tweet, options)
+	{
+		var html = '';
+
+		if (options.tweetActionReplyDecorator ||
+			options.tweetActionRetweetDecorator ||
+			options.tweetActionFavoriteDecorator
+		)
+		{
+			html += '<span class="jta-tweet-actions">';
+
+			if (options.tweetActionReplyDecorator)
+			{
+				html += options.tweetActionReplyDecorator(tweet, options);
+			}
+
+			if (options.tweetActionRetweetDecorator)
+			{
+				html += options.tweetActionRetweetDecorator(tweet, options);
+			}
+
+			if (options.tweetActionFavoriteDecorator)
+			{
+				html += options.tweetActionFavoriteDecorator(tweet, options);
+			}
+
+			html += '</span>';
+		}
+
+		return html;
+	};
+	defaultTweetActionReplyDecorator = function(tweet, options)
+	{
+		var intentUrl = 'https://twitter.com/intent/tweet?in_reply_to=' + tweet.id;
+		var actionLabel = options._resourceBundle._('Reply');
+
+		var html =
+			'<span class="jta-tweet-action-reply">' +
+			'<a href="' + intentUrl + '">' + actionLabel + '</a>' +
+			'</span>';
+
+		return html;
+	};
+	defaultTweetActionRetweetDecorator = function(tweet, options)
+	{
+		var intentUrl = 'https://twitter.com/intent/retweet?tweet_id=' + tweet.id;
+		var actionLabel = options._resourceBundle._('Retweet');
+
+		var html =
+			'<span class="jta-tweet-action-retweet">' +
+			'<a href="' + intentUrl + '">' + actionLabel + '</a>' +
+			'</span>';
+
+		return html;
+	};
+	defaultTweetActionFavoriteDecorator = function(tweet, options)
+	{
+		var intentUrl = 'https://twitter.com/intent/favorite?tweet_id=' + tweet.id;
+		var actionLabel = options._resourceBundle._('Favorite');
+
+		var html =
+			'<span class="jta-tweet-action-favorite">' +
+			'<a href="' + intentUrl + '">' + actionLabel + '</a>' +
+			'</span>';
 
 		return html;
 	};
@@ -1131,7 +1314,7 @@
 				'<a href="http://twitter.com/' + screenName + '" target="_blank">' + screenName + '</a>' +
 				'</div>' +
 				'<div class="jta-login-info-sign-out">' +
-				'Sign out' +
+				options._resourceBundle._('Sign out') +
 				'</div>' +
 				'</div>' +
 				'<div class="jta-clear">&nbsp;</div>'
@@ -1159,7 +1342,7 @@
 	{
 		// the regex to markup @usernames. if @Anywhere is present the task is left to
 		// them
-		return isAnywherePresent() ? text : text.replace(/@([a-zA-Z0-9_]+)/gi,'@<a href="http://twitter.com/$1" class="jta-tweet-a twitter-anywhere-user" target="_blank" rel="nofollow">$1<\/a>');
+		return isAnywherePresent() ? text : text.replace(/\B@(\w+)/gi,'@<a href="http://twitter.com/$1" class="jta-tweet-a twitter-anywhere-user" target="_blank" rel="nofollow">$1<\/a>');
 	};
 	defaultHashtagDecorator = function(text, options)
 	{
@@ -1169,17 +1352,17 @@
 	defaultLoadingDecorator = function(options)
 	{
 		// the default loading decorator simply says: loading ...
-		return '<li class="jta-loading">loading ...</li>';
+		return '<li class="jta-loading">' + options._resourceBundle._('loading') + ' ...</li>';
 	};
 	defaultErrorDecorator = function(errorText, options)
 	{
 		// the default error decorator shows the error message
-		return '<li class="jta-error">ERROR: ' + errorText + '</li>';
+		return '<li class="jta-error">' + options._resourceBundle._('ERROR') + ': ' + errorText + '</li>';
 	};
 	defaultNoDataDecorator = function(options)
 	{
 		// the default no-data decorator simply says: No more data
-		return '<li class="jta-nodata">No more data</li>';
+		return '<li class="jta-nodata">' + options._resourceBundle._('No more data') + '</li>';
 	};
 
 	defaultTweetFilter = function(tweet, options)
@@ -1231,7 +1414,6 @@
 			});
 		}
 	};
-
 	defaultOnDataRequestHandler = function(stats, options)
 	{
 		return true;
@@ -1239,7 +1421,9 @@
 	defaultOnRateLimitDataHandler = function(stats, options)
 	{
 	};
-
+	defaultOnOptionsInitializingHandler = function(options)
+	{
+	};
 	updateLoginInfoElement = function(options, T)
 	{
 		// update the content of the LoginInfo element
@@ -1266,7 +1450,14 @@
 		}
 		else if (options.list)
 		{
-			url += '//api.twitter.com/1/' + options.username + '/lists/' + options.list + '/statuses.json?per_page=20';
+			if ('favorites' == options.list)
+			{
+				url += '//api.twitter.com/1/favorites/' + options.username + '.json?count=20';
+			}
+			else
+			{
+				url += '//api.twitter.com/1/' + options.username + '/lists/' + options.list + '/statuses.json?per_page=20';
+			}
 		}
 		else
 		{
@@ -1278,7 +1469,7 @@
 		if (flPaging)
 		{
 			url +=
-				(options._tweetFeedConfig._maxId > 0 ? '&max_id=' + options._tweetFeedConfig._maxId : '') +
+				(options._tweetFeedConfig._maxId ? '&max_id=' + options._tweetFeedConfig._maxId : '') +
 				'&page=' + options._tweetFeedConfig._pageParam;
 		}
 
@@ -1289,7 +1480,7 @@
 	isAnywherePresent = function()
 	{
 		// check, if @Anywhere is present
-		return typeof(twttr) != 'undefined';
+		return (typeof(twttr) != 'undefined' && typeof(twttr.anywhere) != 'undefined');
 	};
 	clearTweetFeed = function(options)
 	{
@@ -1297,6 +1488,193 @@
 		{
 			options._tweetFeedElement.empty();
 		}
+	};
+	setupOptions = function(options)
+	{
+		options._resourceBundle = JTA_I18N.getResourceBundle('jTweetsAnywhere', options.locale);
+
+		options._tweetBoxConfig.label = options._resourceBundle._("What's happening?");
+
+		// if username is an array, create the search query and flatten username
+		if (typeof(options.username) != 'string')
+		{
+			if (!options.searchParams)
+			{
+				options.searchParams = ['q=from:' + options.username.join(" OR from:")];
+			}
+
+			options.username = options.username[0];
+		}
+
+		// if showTweetFeed is not set to a boolean value, we expect the configuration of
+		// the tweet feed
+		if (typeof(options.showTweetFeed) == 'object')
+		{
+			$.extend(true, options._tweetFeedConfig, options.showTweetFeed);
+		}
+
+		// if showTweetBox is not set to a boolean value, we expect the configuration of
+		// the TweetBox
+		if (typeof(options.showTweetBox) == 'object')
+		{
+			$.extend(true, options._tweetBoxConfig, options.showTweetBox);
+			options.showTweetBox = true;
+		}
+
+		// if showConnectButton is not set to a boolean value, we expect the
+		// configuration of the Connect Button
+		if (typeof(options.showConnectButton) == 'object')
+		{
+			options._connectButtonConfig = options.showConnectButton;
+			options.showConnectButton = true;
+		}
+
+		// to be compatible, check the deprecated option 'tweetProfileImagePresent'
+		if (options._tweetFeedConfig.showProfileImages == null)
+		{
+			options._tweetFeedConfig.showProfileImages = options.tweetProfileImagePresent;
+		}
+
+		// if _tweetFeedConfig.showProfileImages is not set to a boolean value,
+		// we decide to show a profile image if the feed represents a user's
+		// list or the results of a Twitter search
+		if (options._tweetFeedConfig.showProfileImages == null)
+		{
+			options._tweetFeedConfig.showProfileImages = (options.list || options.searchParams) && options.tweetProfileImageDecorator;
+		}
+
+		// handle the autoConformToTwitterStyleguide
+		if (options._tweetFeedConfig.autoConformToTwitterStyleguide)
+		{
+			options._tweetFeedConfig.showUserFullNames = null;
+			options._tweetFeedConfig.showTwitterBird = true;
+			options._tweetFeedConfig.showActionReply = true;
+			options._tweetFeedConfig.showActionRetweet = true;
+			options._tweetFeedConfig.showActionFavorite = true;
+		}
+
+		// if _tweetFeedConfig.showUserScreenNames is not set to a boolean value,
+		// we decide to show a username if the feed represents a user's
+		// list or the results of a Twitter search or a tweet is a native retweet
+		if (options._tweetFeedConfig.showUserScreenNames == null)
+		{
+			if (options.list || options.searchParams)
+			{
+				options._tweetFeedConfig.showUserScreenNames = true;
+			}
+
+			if (!options.tweetUsernameDecorator)
+			{
+				options._tweetFeedConfig.showUserScreenNames = false;
+			}
+		}
+
+		// if _tweetFeedConfig.showUserFullNames is not set to a boolean value,
+		// we decide to show a user's full name if the feed represents a user's
+		// list or the results of a Twitter search or a tweet is a native retweet
+		if (options._tweetFeedConfig.showUserFullNames == null)
+		{
+			if (options.list || options.searchParams)
+			{
+				options._tweetFeedConfig.showUserFullNames = true;
+			}
+
+			if (!options.tweetUsernameDecorator)
+			{
+				options._tweetFeedConfig.showUserFullNames = false;
+			}
+		}
+
+
+		options.count = validateRange(options.count, 0, options.searchParams ? 100 : 20);
+
+		options._tweetFeedConfig.autorefresh.interval = Math.max(30, options._tweetFeedConfig.autorefresh.interval);
+		if (options._tweetFeedConfig.autorefresh.max <= 0)
+		{
+			options._tweetFeedConfig.autorefresh.max = -1;
+		}
+		options._tweetFeedConfig.paging._offset = 0;
+		options._tweetFeedConfig.paging._limit = options.count;
+
+		// internally, the decision of what parts of a widget are to be
+		// displayed is based on the existence of the decorators
+		if (options.count == 0 || !options.showTweetFeed)
+		{
+			options.tweetFeedDecorator = null;
+			options.tweetFeedControlsDecorator = null;
+		}
+
+		if (options._tweetFeedConfig.paging.mode == 'none')
+		{
+			options.tweetFeedControlsDecorator = null;
+		}
+
+		if (!options.showFollowButton)
+		{
+			options.followButtonDecorator = null;
+		}
+
+		if (!options.showTweetBox)
+		{
+			options.tweetBoxDecorator = null;
+		}
+
+		if (!options.showConnectButton)
+		{
+			options.connectButtonDecorator = null;
+		}
+
+		if (!options.showLoginInfo)
+		{
+			options.loginInfoDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showTwitterBird)
+		{
+			options.tweetTwitterBirdDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showTimestamp)
+		{
+			options.tweetTimestampDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showSource)
+		{
+			options.tweetSourceDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showGeoLocation)
+		{
+			options.tweetGeoLocationDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showInReplyTo)
+		{
+			options.tweetInReplyToDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showActionReply)
+		{
+			options.tweetActionReplyDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showActionRetweet)
+		{
+			options.tweetActionRetweetDecorator = null;
+		}
+
+		if (!options._tweetFeedConfig.showActionFavorite)
+		{
+			options.tweetActionFavoriteDecorator = null;
+		}
+	};
+	setupAutorefresh = function(options)
+	{
+		options._tweetFeedConfig.autorefresh._startTime = new Date().getTime();
+
+		startAutorefresh(options);
+		startTimestampRefresh(options);
 	};
 	populateTweetFeed = function(options)
 	{
@@ -1579,14 +1957,34 @@
 				// ...then process them
 				$.each(tweets, function(idx, tweet)
 				{
-					// if this tweet is already in the standard tweets cache, ignore
-					if (!isTweetInCache(tweet, options))
+					// Snowflake support: just update ids that are currently used
+					if (tweet.id_str)
+					{
+						tweet.id = tweet.id_str;
+					}
+
+					if (tweet.in_reply_to_status_id_str)
+					{
+						tweet.in_reply_to_status_id = tweet.in_reply_to_status_id_str;
+					}
+
+					// if this tweet is already in one of the tweet caches, ignore it
+					if (!isTweetInAutorefreshCache(tweet, options) && !isTweetInCache(tweet, options))
 					{
 						// optionally filter tweet ...
 						if (options.tweetFilter(tweet, options))
 						{
 							// ... then put it to the top of the autorefresh cache
 							options._autorefreshTweetsCache.unshift(tweet);
+
+							// if a maximum autorefresh cache size is configured, remove elder tweets
+							if (options._tweetFeedConfig.autorefresh.max > 0)
+							{
+								while (options._autorefreshTweetsCache.length > options._tweetFeedConfig.autorefresh.max)
+								{
+									options._autorefreshTweetsCache.pop();
+								}
+							}
 						}
 					}
 				});
@@ -1615,7 +2013,7 @@
 		{
 			var dataTimestamp = $(element).attr('data-timestamp');
 
-			$(element).html(options.tweetTimestampFormatter(dataTimestamp));
+			$(element).html(options.tweetTimestampFormatter(dataTimestamp, options));
 		});
 
 		startTimestampRefresh(options);
@@ -1627,6 +2025,20 @@
 		for (var i = 0; i < l; i++)
 		{
 			if (tweet.id == options._tweetsCache[i].id)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	};
+	isTweetInAutorefreshCache = function(tweet, options)
+	{
+		var l = options._autorefreshTweetsCache.length;
+
+		for (var i = 0; i < l; i++)
+		{
+			if (tweet.id == options._autorefreshTweetsCache[i].id)
 			{
 				return true;
 			}
@@ -1665,6 +2077,26 @@
     formatDate = function(dateStr)
 	{
     	return dateStr.replace(/^([a-z]{3})( [a-z]{3} \d\d?)(.*)( \d{4})$/i, '$1,$2$4$3');
+    };
+    getUserScreenName = function(tweet)
+    {
+		var screenName = tweet.user ? tweet.user.screen_name : false || tweet.from_user;
+
+		return screenName;
+    };
+    getScreenName = function(tweet)
+    {
+		var t = tweet.retweeted_status || tweet;
+		var screenName = t.user ? t.user.screen_name : false || t.from_user;
+
+		return screenName;
+    };
+    getFullName = function(tweet)
+    {
+		var t = tweet.retweeted_status || tweet;
+		var fullName = t.user ? t.user.name : undefined;
+
+		return fullName;
     };
 	validateRange = function(num, lo, hi)
 	{
@@ -1732,8 +2164,19 @@
 				{
     				$.each(tweets, function(idx, tweet)
     				{
+    					// Snowflake support: just update ids that are currently used
+    					if (tweet.id_str)
+    					{
+    						tweet.id = tweet.id_str;
+    					}
+
+    					if (tweet.in_reply_to_status_id_str)
+    					{
+    						tweet.in_reply_to_status_id = tweet.in_reply_to_status_id_str;
+    					}
+
     					// save the first tweet id for subsequent paging requests
-    					if (options._tweetFeedConfig._maxId <= 0)
+    					if (!options._tweetFeedConfig._maxId)
     					{
     						options._tweetFeedConfig._maxId = tweet.id;
     					}
@@ -1780,8 +2223,7 @@
 			showLoadingIndicator(options);
 		}
 
-		$.getJSON
-		(url, function(data)
+		options.tweetDataProvider(url, function(data)
 		{
 			if (data.error)
 			{
@@ -1796,8 +2238,7 @@
 	};
 	getRateLimit = function(options, callback)
 	{
-		$.getJSON
-		("http://api.twitter.com/1/account/rate_limit_status.json?callback=?", function(rateLimit)
+		options.rateLimitDataProvider(function(rateLimit)
 		{
 			options._stats.rateLimit = rateLimit;
 
@@ -1805,5 +2246,13 @@
 
 			callback(rateLimit);
 		});
+	};
+	defaultTweetDataProvider = function(url, callback)
+	{
+		$.getJSON(url, callback);
+	};
+	defaultRateLimitDataProvider = function(callback)
+	{
+		$.getJSON('http://api.twitter.com/1/account/rate_limit_status.json?callback=?', callback);
 	};
 })(jQuery);
