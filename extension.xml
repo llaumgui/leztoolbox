@@ -2,11 +2,10 @@
 <software>
     <metadata>
         <name>leZToolBox</name>
-        <version>//autogentag//</version>
-        <copyright>Copyright (c) 2008-2011 Guillaume Kulakowski and contributors</copyright>
+        <version>1.0.0-LS</version>
+        <copyright>Copyright (c) 2008-2014 Guillaume Kulakowski and contributors</copyright>
         <license>GNU General Public License v2.0</license>
         <info_url>http://projects.llaumgui.com/index.php/p/leztoolbox</info_url>
-
         <software>
             <uses>
                 <name>jQuery Cookies</name>
@@ -21,12 +20,5 @@
                 <version>1.3.1</version>
             </uses>
         </software>
-
     </metadata>
-
-    <dependencies>
-        <requires>
-        </requires>
-    </dependencies>
-
 </software>
