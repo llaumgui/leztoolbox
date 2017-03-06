@@ -1,3 +1,5 @@
+**This project is discontinued.**
+
 Introduction
 ============
 leZToolBox is a toolbox for eZ Publish 4.
